@@ -28,7 +28,7 @@ Usado por toda promotoria do estado. Todos interessados que possuem acesso a mí
 
 ---
 
-**High-leve design da aplicação**
+**High-level design da aplicação**
 
 A tabela abaixo descreve cada componente ilustrado no digrama high-level da aplicação.
 
