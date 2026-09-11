@@ -2,14 +2,22 @@
 
 ### Trabalho da Disciplina PGC308F - Grupo 1
 
-**Descrição**
+---
 
-Repositório para centralizar a documentação das etapas exigidas para o trabalho final.
+### 1. Descrição
 
-**Estrutura do Repositório**
+* **Objetivo**: Repositório para centralizar a documentação das etapas exigidas para o trabalho final.
 
-O documento [SERVICO.md](SERVICO.md) descreve com detalhes o funcionamento do case usado para este trabalho. Também possui um diagrama high-leve da arquitetura para ajudar a identificar os componentes principais. Portanto, dúvidas relacionadas a funcionalidades e arquitetura podem ser sanadas neste documento.
+* **Nome do grupo**: Grupo 1.
 
-O documento [REQUISITOS.md](REQUISITOS.md) possui a listagem dos requisitos funcionais e não funcionais. 
+* **Membros do grupo**: Alexandre, Bruno, Carlos e Rocha.
 
-O documento [MODELAGEM_AMEACAS.md](MODELAGEM_AMEACAS.md) possui a modelagem das ameaças utilizando o framework STRIDE.
+---
+
+### 2. Estrutura do Repositório
+
+* O documento [SERVICO.md](SERVICO.md) descreve com detalhes o funcionamento do case usado para este trabalho. Também possui um diagrama high-leve da arquitetura para ajudar a identificar os componentes principais. Portanto, dúvidas relacionadas a funcionalidades e arquitetura podem ser sanadas neste documento.
+
+* O documento [REQUISITOS.md](REQUISITOS.md) possui a listagem dos requisitos funcionais e não funcionais. 
+
+* O documento [MODELAGEM_AMEACAS.md](MODELAGEM_AMEACAS.md) possui a modelagem das ameaças utilizando o framework STRIDE.
