@@ -4,31 +4,46 @@
 
 ---
 
-**O que é**
+### 1. O que é
 
 Um serviço que recebe mídias relacionadas a processos e realiza a transcrição das mesmas. Essas mídias podem ser gravações de depoimentos, oitivas e inquéritos policiais.
 
 ---
 
-**Como faz**
+### 2. Como faz
 
 O usuário consulta um determinado processo dentro de uma plataforma e procura pelas mídias disponíveis. Seleciona a mídia que deseja transcrever. Um upload da mídia é feito para outro serviço de storage do cliente, e uma mensagem é enviada para uma fila para iniciar a transcrição. A transcrição é feita por uma I.A e disponibilizada para o cliente dentro desse mesmo serviço.
 
 ---
 
-**Para que serve**
+### 3. Para que serve
 
 O serviço é usado para obter uma versão transcrita (textual) de mídias de longas duração, e permitir a interação dessa versão transcrita com I.As.
 
 ---
 
-**Para quem**
+### 4. Para quem
 
 Usado por toda promotoria do estado. Todos interessados que possuem acesso a mídias (áudios e vídeos) relacionados a depoimentos e inquéritos.
 
 ---
 
-**High-level design da aplicação**
+### 5. Ativos
+
+Na tabela abaixo serão listados os ativos importantes do sistema. O objetivo com isso é viabilizar a identificação de vulnerabilidades para a modelagem de ameaças.
+
+| ID | Ativo | Descrição |
+| --- | --- | --- |
+| A1 | Credenciais | Credenciais de acesso da promotoria |
+| A2 | Dados de processos | Dados relacionados a processos de natureza jurídica de todo estado |
+| A3 | Mídias | Áudios e vídeos relacionados aos processos do ativo **A2** |
+| A4 | Informações de cunho profissional | Informações relacionadas a quais processos cada membro da promotoria está atuando |
+| A5 | Informações pessoais | Informações pessoais que podem estar contidas no ativo **A2** |
+| A6 | Interações com I.A | Interações entre o usuário e a I.A disponibilizada dentro do serviço |
+
+---
+
+### 6 - High-level design da aplicação
 
 A tabela abaixo descreve cada componente ilustrado no digrama high-level da aplicação.
 
