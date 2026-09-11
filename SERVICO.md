@@ -17,3 +17,7 @@ O serviço é usado para obter uma versão transcrita (textual) de mídias de lo
 **Para quem**
 
 Usado por promotores de justiça do estado.
+
+**High-leve design da aplicação**
+
+![hld](resources/hldesign.png)

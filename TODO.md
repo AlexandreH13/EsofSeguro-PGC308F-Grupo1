@@ -12,7 +12,7 @@
 
 * Alexandre:
     - Stride: Modelar o "I" e o "D"
-    - Expandir requisitos não funcionais: Desempenho, Escabilidade
+    - Expandir requisitos não funcionais: Desempenho, Escalabilidade
 
 * Bruno:
     - Stride: Modelar o "E"
