@@ -30,4 +30,16 @@ Usado por toda promotoria do estado. Todos interessados que possuem acesso a mí
 
 **High-leve design da aplicação**
 
+A tabela abaixo descreve cada componente ilustrado no digrama high-level da aplicação.
+
+| Componente | Descrição |
+| --- | --- |
+| Backend | Serviço web que recebe requisições do usuário. Interage com API que busca informações dos processos e envia para a fila a solicitação de transcrição |
+| Integração | API que realiza integração com serviço terceiro que possui os dados dos processos e as mídias armazenadas |
+| Sistema Processos | Sistema do Estado com as informações dos processos e mídias |
+| Storage | Serviço de armazenamento na nuvem que vai persistir as mídias e suas transcrições |
+| Enfileiramento | Sistema de filas para permitir o processamento assíncrono |
+| Módulo I.A | Serviço python que "escuta" a fila e gerencia as requisições de transcrição. Envia a mídia para a I.A degravar e formata a saída para persistir a transcrição no formato ideal.
+| I.A | Serviço de I.A utilizado via API |
+
 ![hld](resources/hldesign.png)
