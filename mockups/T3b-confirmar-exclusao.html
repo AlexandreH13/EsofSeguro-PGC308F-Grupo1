@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>T3b Confirmar exclusão</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="screen">
+  <div class="header">
+    <div class="row" style="gap:40px">
+      <div class="brand">Transcrição de Mídias</div>
+      <nav><a>Processos</a><a class="active">Minhas transcrições</a></nav>
+    </div>
+    <div class="user">Ana Souza, 3ª Promotoria Criminal <a>Sair</a></div>
+  </div>
+  <div class="content">
+    <div class="row between">
+      <div>
+        <h1>Minhas transcrições</h1>
+        <p class="muted">Agrupadas por processo. Somente as transcrições solicitadas por você aparecem aqui.</p>
+      </div>
+      <span class="muted small">Atualizado há 1 min</span>
+    </div>
+
+    <div class="group-title">Processo 0001234-56.2025.8.26.0100 · 2ª Vara Criminal da Capital</div>
+    <table class="grid">
+      <tr><th>Mídia</th><th>Solicitada em</th><th>Status</th><th class="actions">Ações</th></tr>
+      <tr>
+        <td>Depoimento_testemunha_01.mp3</td><td>10/09/2026 14:32</td>
+        <td><span class="badge done">Finalizada</span></td>
+        <td class="actions"><span class="btn small secondary">Abrir</span> <span class="btn small secondary">Baixar .docx</span> <span class="btn small danger">Excluir</span></td>
+      </tr>
+      <tr>
+        <td>Inquerito_depoimento_02.mp3</td><td>12/09/2026 09:15</td>
+        <td><span class="badge running">Em processamento</span> <span class="muted small">iniciado há 12 min</span></td>
+        <td class="actions"><span class="btn small danger disabled">Excluir</span></td>
+      </tr>
+      <tr>
+        <td>Oitiva_investigado.mp4</td><td>12/09/2026 10:02</td>
+        <td><span class="badge queue">Na fila</span> <span class="muted small">fila de mídias grandes</span></td>
+        <td class="actions"><span class="btn small danger disabled">Excluir</span></td>
+      </tr>
+    </table>
+
+    <div class="group-title">Processo 0007890-12.2024.8.26.0050 · 1ª Vara do Júri</div>
+    <table class="grid">
+      <tr><th>Mídia</th><th>Solicitada em</th><th>Status</th><th class="actions">Ações</th></tr>
+      <tr>
+        <td>Audiencia_preliminar.mp3</td><td>05/09/2026 16:40</td>
+        <td><span class="badge fail">Falha</span> <span class="muted small">tempo limite de 1 hora excedido</span></td>
+        <td class="actions"><span class="btn small secondary">Solicitar novamente</span> <span class="btn small danger">Excluir</span></td>
+      </tr>
+    </table>
+
+    <div class="callout" style="margin-top:24px">O status muda sozinho conforme o Módulo I.A avança: na fila, em processamento, finalizada ou falha (RQF4). A lista mostra apenas transcrições do próprio promotor, agrupadas por processo (RQF5). Excluir só fica disponível para transcrições finalizadas ou com falha (RQF9).</div>
+  </div>
+  <div class="backdrop">
+    <div class="modal" data-rqf="RQF9">
+      <h1>Excluir transcrição?</h1>
+      <p>A transcrição de <strong>Depoimento_testemunha_01.mp3</strong> e a cópia da mídia serão removidas do Storage. Esta ação não pode ser desfeita.</p>
+      <p class="muted small">A mídia original permanece no Sistema Processos. Uma nova transcrição pode ser solicitada depois.</p>
+      <div class="actions"><span class="btn secondary">Cancelar</span><span class="btn" style="background:var(--danger);border-color:var(--danger)">Excluir</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

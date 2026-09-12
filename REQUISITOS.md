@@ -8,7 +8,7 @@ Documento usado para listar os requisitos levantados. Cada requisito funcional e
 
 | ID | Descrição |
 | --- | --- |
-| RQF1 | Permitir um promotor do estado realizar acesso com suas credenciais |
+| RQF1 | Permitir um promotor do estado realizar acesso com suas credenciais institucionais |
 | RQF2 | Usuário pode pesquisar mídias disponíveis de um processo |
 | RQF3 | Usuário seleciona a mídia desejada para transcrição |
 | RQF4 | Usuário pode acompanhar o status da transcrição da mídia (assíncrono) |
@@ -17,6 +17,8 @@ Documento usado para listar os requisitos levantados. Cada requisito funcional e
 | RQF7 | Usuário pode selecionar uma transcrição finalizada para usar como contexto na interação com a Inteligência Artificial disponível no sistema |
 | RQF8 | Usuário pode fazer o download da transcrição em formato .docx |
 | RQF9 | Usuário pode deletar uma transcrição da sua lista de transcrições |
+| RQF10 | Usuário pode enviar perguntas à Inteligência Artificial e receber respostas baseadas na transcrição selecionada como contexto |
+| RQF11 | Usuário pode encerrar sua sessão no sistema |
 
 ---
 

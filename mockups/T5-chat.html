@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>T5 Chat</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="screen">
+  <div class="header">
+    <div class="row" style="gap:40px">
+      <div class="brand">Transcrição de Mídias</div>
+      <nav><a>Processos</a><a class="active">Minhas transcrições</a></nav>
+    </div>
+    <div class="user">Ana Souza, 3ª Promotoria Criminal <a>Sair</a></div>
+  </div>
+  <div class="content">
+    <div class="crumb"><a>Minhas transcrições</a> › <a>Processo 0001234-56.2025.8.26.0100</a> › <a>Depoimento_testemunha_01.mp3</a> › Chat com a I.A</div>
+    <div class="sidebar-layout">
+      <div class="main">
+        <div class="chat-box" data-rqf="RQF10">
+          <div class="chat">
+            <div class="bubble user"><div class="who">Você</div>Resuma os pontos principais do depoimento.</div>
+            <div class="bubble ai"><div class="who">I.A</div>A testemunha é vizinha do imóvel há seis anos. Na noite de 14 de março estava em casa desde as 21h. Por volta das 22h ouviu uma discussão no apartamento ao lado, com pelo menos duas vozes, uma masculina e uma feminina, seguida de um barulho de objeto caindo. A discussão durou cerca de dez minutos. Ela não reconheceu a voz masculina.</div>
+            <div class="bubble user"><div class="who">Você</div>Em que trecho ela menciona o horário da discussão?</div>
+            <div class="bubble ai"><div class="who">I.A</div>Em 00:00:55: "Por volta das vinte e duas horas ouvi uma discussão no apartamento ao lado."</div>
+          </div>
+          <div class="composer">
+            <span class="input">Pergunte algo sobre esta transcrição</span>
+            <span class="btn">Enviar</span>
+          </div>
+        </div>
+      </div>
+      <div class="side">
+        <div class="card" data-rqf="RQF7">
+          <div class="group-title" style="margin-top:0">Contexto do chat</div>
+          <p><strong>Depoimento_testemunha_01.mp3</strong></p>
+          <p class="muted">Processo 0001234-56.2025.8.26.0100<br>42 min, cerca de 6.800 palavras</p>
+          <p class="muted">A transcrição inteira é enviada à I.A junto com cada pergunta.</p>
+          <span class="btn danger block">Encerrar chat</span>
+        </div>
+        <div class="callout warn" style="margin-top:16px">Nada desta conversa é salvo. Ao encerrar o chat ou sair do sistema, perguntas, respostas e contexto são descartados (RQNF3.3).</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:24px">A transcrição entra como contexto automaticamente ao abrir o chat, sem ação do promotor (RQF7, RQNF3.4). Cada pergunta vai para a I.A externa com a transcrição e o histórico; a resposta volta para a tela (RQF10).</div>
+  </div>
+</div>
+</body>
+</html>

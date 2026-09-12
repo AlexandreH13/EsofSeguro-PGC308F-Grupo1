@@ -20,4 +20,14 @@
 
 * O documento [REQUISITOS.md](REQUISITOS.md) possui a listagem dos requisitos funcionais e não funcionais. 
 
+* A pasta [requisitos funcionais](requisitos%20funcionais) contém os casos de uso: um arquivo por requisito funcional, com o diagrama de sequência das interações entre os componentes do serviço. O [README](requisitos%20funcionais/README.md) da pasta reúne convenções, premissas e índice.
+
+* As imagens ficam em [resources/diagramas](resources/diagramas) e [resources/mockups](resources/mockups). A fonte dos diagramas é o bloco mermaid de cada arquivo em `requisitos funcionais/`; a fonte das telas é [mockups](mockups)/*.html. Elementos marcados com `data-rqf="RQFn"` geram a variante da tela com destaque daquele requisito. Para regerar após uma alteração:
+
+```
+npm install
+npm run diagramas
+npm run mockups
+```
+
 * O documento [MODELAGEM_AMEACAS.md](MODELAGEM_AMEACAS.md) possui a modelagem das ameaças utilizando o framework STRIDE.
