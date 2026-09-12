@@ -20,4 +20,6 @@
 
 * O documento [REQUISITOS.md](REQUISITOS.md) possui a listagem dos requisitos funcionais e não funcionais. 
 
+* O documento [CASOS_DE_USO.md](CASOS_DE_USO.md) expande cada requisito funcional em um diagrama de sequência com as interações entre os componentes do serviço.
+
 * O documento [MODELAGEM_AMEACAS.md](MODELAGEM_AMEACAS.md) possui a modelagem das ameaças utilizando o framework STRIDE.

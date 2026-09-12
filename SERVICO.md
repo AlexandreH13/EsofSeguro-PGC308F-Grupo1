@@ -26,6 +26,8 @@ O serviço é usado para obter uma versão transcrita (textual) de mídias de lo
 
 Usado por toda promotoria do estado. Todos interessados que possuem acesso a mídias (áudios e vídeos) relacionados a depoimentos e inquéritos.
 
+**Fora de escopo.** A inclusão de mídias nos processos acontece no Sistema Processos, por atores externos a este serviço (polícia, cartórios, servidores do Ministério Público). Este serviço apenas lê processos e mídias por meio da Integração e nunca escreve no Sistema Processos.
+
 ---
 
 ### 5. Ativos

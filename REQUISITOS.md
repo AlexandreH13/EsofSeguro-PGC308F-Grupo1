@@ -17,6 +17,8 @@ Documento usado para listar os requisitos levantados. Cada requisito funcional e
 | RQF7 | Usuário pode selecionar uma transcrição finalizada para usar como contexto na interação com a Inteligência Artificial disponível no sistema |
 | RQF8 | Usuário pode fazer o download da transcrição em formato .docx |
 | RQF9 | Usuário pode deletar uma transcrição da sua lista de transcrições |
+| RQF10 | Usuário pode enviar perguntas à Inteligência Artificial e receber respostas baseadas na transcrição selecionada como contexto |
+| RQF11 | Usuário pode encerrar sua sessão no sistema |
 
 ---
 
