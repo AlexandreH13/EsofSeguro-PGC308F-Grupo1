@@ -9,3 +9,7 @@
 # Editores
 *.swp
 *~
+
+# Node
+node_modules/
+.cache/
