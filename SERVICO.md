@@ -26,7 +26,7 @@ O serviço é usado para obter uma versão transcrita (textual) de mídias de lo
 
 Usado por toda promotoria do estado. Todos interessados que possuem acesso a mídias (áudios e vídeos) relacionados a depoimentos e inquéritos.
 
-**Fora de escopo.** A inclusão de mídias nos processos acontece no Sistema Processos, por atores externos a este serviço (polícia, cartórios, servidores do Ministério Público). Este serviço apenas lê processos e mídias por meio da Integração e nunca escreve no Sistema Processos.
+**Fora de escopo.** Atores externos a este serviço (polícia, cartórios, servidores do Ministério Público) incluem as mídias nos processos, dentro do Sistema Processos. Este serviço apenas lê processos e mídias pela API do Sistema Processos (Integração) e nunca escreve nele. O cadastro e a desativação de promotores acontecem no provedor de identidade institucional, e este serviço não gerencia usuários nem senhas.
 
 ---
 
@@ -52,7 +52,8 @@ A tabela abaixo descreve cada componente ilustrado no digrama high-level da apli
 | Componente | Descrição |
 | --- | --- |
 | Backend | Serviço web que recebe requisições do usuário. Interage com API que busca informações dos processos e envia para a fila a solicitação de transcrição |
-| Integração | API que realiza integração com serviço terceiro que possui os dados dos processos e as mídias armazenadas |
+| Provedor de Identidade | Serviço de autenticação institucional do Ministério Público (SSO). Valida as credenciais do promotor e emite o token de identidade que o Backend usa para criar a sessão |
+| Integração | API do Sistema Processos, que o Backend consome diretamente para buscar dados dos processos e mídias. Não é um serviço próprio deste sistema |
 | Sistema Processos | Sistema do Estado com as informações dos processos e mídias |
 | Storage | Serviço de armazenamento na nuvem que vai persistir as mídias e suas transcrições |
 | Enfileiramento | Sistema de filas para permitir o processamento assíncrono |

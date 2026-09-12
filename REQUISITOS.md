@@ -8,7 +8,7 @@ Documento usado para listar os requisitos levantados. Cada requisito funcional e
 
 | ID | Descrição |
 | --- | --- |
-| RQF1 | Permitir um promotor do estado realizar acesso com suas credenciais |
+| RQF1 | Permitir um promotor do estado realizar acesso com suas credenciais institucionais |
 | RQF2 | Usuário pode pesquisar mídias disponíveis de um processo |
 | RQF3 | Usuário seleciona a mídia desejada para transcrição |
 | RQF4 | Usuário pode acompanhar o status da transcrição da mídia (assíncrono) |
