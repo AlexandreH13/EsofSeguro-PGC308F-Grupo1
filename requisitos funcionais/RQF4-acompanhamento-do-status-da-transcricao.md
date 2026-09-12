@@ -1,0 +1,56 @@
+### RQF4: Acompanhamento do status da transcrição
+
+Convenções, participantes e premissas estão no [README](README.md) desta pasta.
+
+**Ator:** Promotor.
+
+**Pré-condições:** existe um registro de transcrição com status `na fila` (RQF3).
+
+**Pós-condições:** o registro termina com status `finalizada` ou `falha`. Em caso de sucesso, a transcrição está salva no Storage.
+
+**Tela de referência:** T3 Minhas transcrições.
+
+![T3 Minhas transcrições](../resources/mockups/T3-minhas-transcricoes--RQF4.png)
+
+![RQF4](../resources/diagramas/RQF4.png)
+
+<details>
+<summary>Código mermaid</summary>
+
+```mermaid
+sequenceDiagram
+    actor P as Promotor
+    participant B as Backend
+    participant F as Fila
+    participant M as Módulo I.A
+    participant S as Storage
+    participant IA as I.A
+    par Processamento assíncrono
+        M->>F: Consome mensagem
+        F-->>M: Mensagem (id da transcrição, caminho no Storage)
+        M->>B: Atualiza status "em processamento"
+        M->>S: Baixa mídia
+        S-->>M: Arquivo da mídia
+        M->>IA: Envia mídia para transcrição
+        alt Transcrição concluída
+            IA-->>M: Texto transcrito
+            M->>M: Formata transcrição
+            M->>S: Salva transcrição
+            S-->>M: Confirmação com caminho no Storage
+            M->>B: Atualiza status "finalizada"
+        else Falha na I.A ou tempo acima de 1 hora (RQNF3.2)
+            M->>B: Atualiza status "falha" com motivo
+        end
+        M->>F: Confirma consumo da mensagem
+    and Acompanhamento pelo promotor
+        loop Enquanto status for "na fila" ou "em processamento"
+            P->>B: Consulta status (id da transcrição)
+            B->>B: Valida sessão e propriedade da transcrição
+            B-->>P: Status atual
+        end
+    end
+```
+
+</details>
+
+**Notas:** o Módulo I.A só confirma a mensagem na fila após registrar o status final, para que a mensagem possa ser reprocessada se o módulo cair no meio do processamento. Uma consulta a transcrição de outro promotor retorna acesso negado.

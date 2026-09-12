@@ -20,6 +20,10 @@
 
 * O documento [REQUISITOS.md](REQUISITOS.md) possui a listagem dos requisitos funcionais e não funcionais. 
 
-* O documento [CASOS_DE_USO.md](CASOS_DE_USO.md) expande cada requisito funcional em um diagrama de sequência com as interações entre os componentes do serviço.
+* A pasta [requisitos funcionais](requisitos%20funcionais) contém os casos de uso: um arquivo por requisito funcional, com o diagrama de sequência das interações entre os componentes do serviço. O [README](requisitos%20funcionais/README.md) da pasta reúne convenções, premissas e índice.
+
+* A pasta [resources/diagramas](resources/diagramas) contém os diagramas de `requisitos funcionais/` exportados em PNG com fundo transparente. Para regenerar, rode `npm install` e `npm run diagramas`.
+
+* A pasta [mockups](mockups) contém as telas de referência em HTML, e [resources/mockups](resources/mockups) as mesmas telas exportadas em PNG. Para regenerar, rode `npm run mockups`.
 
 * O documento [MODELAGEM_AMEACAS.md](MODELAGEM_AMEACAS.md) possui a modelagem das ameaças utilizando o framework STRIDE.
