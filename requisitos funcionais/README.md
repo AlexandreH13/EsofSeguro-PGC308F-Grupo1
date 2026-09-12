@@ -68,14 +68,3 @@ Mockups de baixa fidelidade, para referência, não o design final. A variante `
 | T4   | [Transcrição](../resources/mockups/T4-transcricao.png)                        | RQF6, RQF7, RQF8 |
 | T5   | [Chat com a I.A](../resources/mockups/T5-chat.png)                            | RQF7, RQF10      |
 | T6   | [Sessão encerrada](../resources/mockups/T6-sessao-encerrada.png)              | RQF11            |
-
----
-
-### 4. Manutenção deste documento
-
-- Toda mudança em um requisito funcional de REQUISITOS.md se reflete no arquivo correspondente desta pasta e na tabela do índice. O nome do arquivo segue o padrão `RQFn-nome-do-caso.md` (minúsculas, sem acentos, hífens). O heading começa com o código do requisito, pois o script de renderização usa esse heading para nomear o PNG.
-- O bloco mermaid recolhível de cada arquivo é a fonte do diagrama. Após alterá-lo, rode `npm run diagramas` (na primeira vez, `npm install`) para regerar o PNG em `resources/diagramas/`. `--classic` desliga o estilo sketch.
-- As telas são `mockups/*.html`, com o estilo em `mockups/estilo.css`. Após alterar uma tela, rode `npm run mockups` para regerar os PNGs em `resources/mockups/`. Elementos marcados com `data-rqf="RQFn"` geram a variante destacada daquele requisito. Uma tela nova entra na tabela da seção 3 e no arquivo do requisito.
-- Ao alterar a tabela de componentes em SERVICO.md, atualizar a tabela de participantes na seção 1 e os nomes usados nos diagramas.
-- Ao resolver uma premissa da seção 1, remover a premissa e ajustar os diagramas afetados.
-- Cada ameaça em MODELAGEM_AMEACAS.md aponta para um RQF desta pasta. Uma ameaça sem interação correspondente no diagrama daquele RQF indica que o diagrama está incompleto.
