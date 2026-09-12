@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>T2 Processo</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="screen">
+  <div class="header">
+    <div class="row" style="gap:40px">
+      <div class="brand">Transcrição de Mídias</div>
+      <nav><a class="active">Processos</a><a>Minhas transcrições</a></nav>
+    </div>
+    <div class="user">Ana Souza, 3ª Promotoria Criminal <a>Sair</a></div>
+  </div>
+  <div class="content">
+    <h1>Consultar processo</h1>
+    <p class="muted">Informe o número do processo para listar as mídias disponíveis no Sistema Processos.</p>
+    <div class="row" style="margin:16px 0 28px" data-rqf="RQF2">
+      <span class="input" style="min-width:380px">0001234-56.2025.8.26.0100</span>
+      <span class="btn">Buscar</span>
+    </div>
+
+    <div class="card">
+      <div class="kv">
+        <div><div class="k">Processo</div><div class="v">0001234-56.2025.8.26.0100</div></div>
+        <div><div class="k">Vara</div><div class="v">2ª Vara Criminal da Capital</div></div>
+        <div><div class="k">Classe</div><div class="v">Ação Penal</div></div>
+        <div><div class="k">Situação</div><div class="v">Em andamento</div></div>
+      </div>
+    </div>
+
+    <h2>Mídias do processo (4)</h2>
+    <table class="grid" data-rqf="RQF2">
+      <tr><th>Mídia</th><th>Tipo</th><th>Duração</th><th>Tamanho</th><th>Transcrição</th><th class="actions">Ação</th></tr>
+      <tr>
+        <td>Depoimento_testemunha_01.mp3</td><td>Áudio</td><td>42 min</td><td>38 MB</td>
+        <td><span class="badge done">Finalizada</span></td>
+        <td class="actions"><span class="btn small secondary">Ver transcrição</span></td>
+      </tr>
+      <tr>
+        <td>Inquerito_depoimento_02.mp3</td><td>Áudio</td><td>18 min</td><td>16 MB</td>
+        <td><span class="badge running">Em processamento</span></td>
+        <td class="actions"><span class="btn small secondary">Acompanhar</span></td>
+      </tr>
+      <tr>
+        <td>Oitiva_investigado.mp4</td><td>Vídeo</td><td>1 h 05 min</td><td>76 MB</td>
+        <td class="muted">Não solicitada</td>
+        <td class="actions"><span class="btn small" data-rqf="RQF3">Transcrever</span></td>
+      </tr>
+      <tr>
+        <td>Audiencia_instrucao.mp4</td><td>Vídeo</td><td>2 h 10 min</td><td>240 MB</td>
+        <td class="muted">Acima do limite de 80 MB</td>
+        <td class="actions"><span class="btn small disabled">Transcrever</span></td>
+      </tr>
+    </table>
+
+    <div class="callout" style="margin-top:24px">A busca e a lista de mídias vêm do Sistema Processos, que também decide se o promotor tem acesso ao processo (RQF2). Ao clicar em Transcrever, o sistema copia a mídia para o Storage e coloca a transcrição na fila (RQF3). Mídias acima de 80 MB não podem ser transcritas (RQNF3.1).</div>
+  </div>
+</div>
+</body>
+</html>
