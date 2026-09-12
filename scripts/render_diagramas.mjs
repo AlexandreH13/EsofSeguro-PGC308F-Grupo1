@@ -84,6 +84,7 @@ async function main() {
           if (rough) {
             const converter = new window.svg2roughjs.Svg2Roughjs("#out");
             converter.svg = el;
+            converter.seed = 1;
             await converter.sketch();
             src.innerHTML = "";
             final = out.querySelector("svg");
