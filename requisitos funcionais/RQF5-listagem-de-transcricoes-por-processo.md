@@ -2,11 +2,9 @@
 
 Convenções, participantes e premissas estão no [README](README.md) desta pasta.
 
-**Ator:** Promotor.
-
 **Pré-condições:** sessão ativa.
 
-**Pós-condições:** o promotor visualiza suas transcrições agrupadas por processo, com o status de cada uma.
+**Pós-condições:** o promotor visualiza suas transcrições agrupadas por processo.
 
 **Tela de referência:** T3 Minhas transcrições.
 
@@ -39,4 +37,4 @@ sequenceDiagram
 
 </details>
 
-**Notas:** a lista contém apenas transcrições do próprio promotor. Se a consulta ao Sistema Processos falhar, a lista mostra somente os números dos processos.
+**Notas:** se a consulta ao Sistema Processos falhar, a lista mostra somente os números dos processos.

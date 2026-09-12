@@ -1,14 +1,6 @@
 #!/usr/bin/env node
-// Renderiza cada mockups/*.html em PNG com fundo transparente em resources/mockups/.
-//
-// Além da imagem base, gera uma variante por requisito marcado no HTML com
-// data-rqf="RQFn" (vários códigos separados por espaço). Na variante, os
-// elementos daquele requisito recebem um contorno azul e uma etiqueta com o
-// código. Nome da variante: <tela>--RQFn.png.
-//
-// Uso:
-//   npm run mockups
-//   npm run mockups -- --scale 3
+// Os arquivos de "requisitos funcionais/" referenciam as imagens por nome
+// (<tela>.png e <tela>--RQFn.png); mudar a nomenclatura quebra esses links.
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";

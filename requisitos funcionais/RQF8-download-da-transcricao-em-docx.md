@@ -2,8 +2,6 @@
 
 Convenções, participantes e premissas estão no [README](README.md) desta pasta.
 
-**Ator:** Promotor.
-
 **Pré-condições:** sessão ativa. Existe uma transcrição do promotor com status `finalizada`.
 
 **Pós-condições:** o promotor recebe um arquivo .docx com o conteúdo da transcrição.
@@ -36,4 +34,4 @@ sequenceDiagram
 
 </details>
 
-**Notas:** o arquivo sai do controle do sistema após o download. Esse é o ponto em que dados dos ativos A2, A3 e A5 deixam o perímetro da aplicação.
+**Notas:** o download é o ponto em que dados dos ativos A2, A3 e A5 saem do controle do sistema.

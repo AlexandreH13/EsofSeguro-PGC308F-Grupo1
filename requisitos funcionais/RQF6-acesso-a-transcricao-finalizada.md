@@ -2,8 +2,6 @@
 
 Convenções, participantes e premissas estão no [README](README.md) desta pasta.
 
-**Ator:** Promotor.
-
 **Pré-condições:** sessão ativa. Existe uma transcrição do promotor com status `finalizada`.
 
 **Pós-condições:** o promotor visualiza o conteúdo da transcrição.

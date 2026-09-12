@@ -2,8 +2,6 @@
 
 Convenções, participantes e premissas estão no [README](README.md) desta pasta.
 
-**Ator:** Promotor.
-
 **Pré-condições:** existe um registro de transcrição com status `na fila` (RQF3).
 
 **Pós-condições:** o registro termina com status `finalizada` ou `falha`. Em caso de sucesso, a transcrição está salva no Storage.

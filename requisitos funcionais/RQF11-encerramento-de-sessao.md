@@ -2,8 +2,6 @@
 
 Convenções, participantes e premissas estão no [README](README.md) desta pasta.
 
-**Ator:** Promotor.
-
 **Pré-condições:** sessão ativa.
 
 **Pós-condições:** o token de sessão está inválido e o Backend descartou qualquer chat ativo.
@@ -32,4 +30,4 @@ sequenceDiagram
 
 </details>
 
-**Notas:** o tempo de expiração por inatividade ainda não está definido nos requisitos não funcionais. O encerramento invalida apenas a sessão deste serviço. A sessão no provedor de identidade permanece, pois single logout não está previsto.
+**Notas:** o tempo de expiração por inatividade ainda não está definido nos requisitos não funcionais. A sessão no provedor de identidade permanece após o encerramento, pois single logout não está previsto.

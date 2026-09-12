@@ -1,18 +1,8 @@
 #!/usr/bin/env node
-// Renderiza os blocos ```mermaid dos markdowns de uma pasta (ou de um arquivo)
-// em PNG com fundo transparente.
-//
-// Uso:
-//   npm run diagramas
-//   npm run diagramas -- --classic          (sem sketch)
-//   npm run diagramas -- --scale 3
-//   npm run diagramas -- --input OUTRO.md --output pasta/
-//
-// Por padrão lê todos os .md de "requisitos funcionais/". Cada bloco vira um
-// PNG nomeado pelo código do requisito do heading anterior (RQF1.png, ...).
-// O sketch replica o modo "Rough" do Mermaid Live Editor: a lib svg2roughjs
-// pós-processa o SVG do mermaid com as opções padrão dela, incluindo a fonte
-// Comic Sans MS.
+// Os arquivos de "requisitos funcionais/" referenciam os PNGs por código do
+// requisito (RQFn.png), extraído do heading `### RQFn` anterior a cada bloco.
+// O sketch usa svg2roughjs com as opções padrão, Comic Sans MS inclusive, para
+// replicar o modo "Rough" do Mermaid Live Editor.
 import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";

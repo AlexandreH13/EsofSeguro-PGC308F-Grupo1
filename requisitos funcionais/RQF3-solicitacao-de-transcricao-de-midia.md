@@ -2,8 +2,6 @@
 
 Convenções, participantes e premissas estão no [README](README.md) desta pasta.
 
-**Ator:** Promotor.
-
 **Pré-condições:** sessão ativa. O promotor visualizou a lista de mídias do processo (RQF2).
 
 **Pós-condições:** em caso de sucesso, a mídia está copiada no Storage, existe um registro de transcrição com status `na fila` e uma mensagem foi publicada na fila.
@@ -49,4 +47,4 @@ sequenceDiagram
 
 </details>
 
-**Notas:** o Backend verifica o tamanho pelos metadados antes de transferir o arquivo, para evitar tráfego desnecessário. A validação após o recebimento cobre o caso em que o arquivo real diverge dos metadados declarados (premissa 5). Se essa validação falhar, o Backend recusa a solicitação e não copia o arquivo para o Storage. O promotor pode solicitar mais de uma transcrição (RQNF4.2), então o fluxo se repete por mídia.
+**Notas:** verificar o tamanho pelos metadados antes de transferir evita tráfego desnecessário. A validação após o recebimento cobre o caso em que o arquivo real diverge dos metadados declarados (premissa 5). Se ela falhar, o Backend recusa a solicitação e não copia o arquivo para o Storage. O promotor pode solicitar mais de uma transcrição (RQNF4.2), então o fluxo se repete por mídia.

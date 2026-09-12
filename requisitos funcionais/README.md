@@ -1,6 +1,6 @@
 ## Casos de Uso
 
-Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um diagrama de sequência em um arquivo próprio nesta pasta. Este documento reúne as convenções comuns a todos os diagramas e o índice. Os diagramas mostram as interações entre os componentes descritos em [SERVICO.md](../SERVICO.md), pois cada interação e cada fronteira entre componentes é um ponto candidato a ameaça na [modelagem STRIDE](../MODELAGEM_AMEACAS.md).
+Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um diagrama de sequência em um arquivo próprio nesta pasta. Os diagramas mostram as interações entre os componentes descritos em [SERVICO.md](../SERVICO.md), pois cada interação e cada fronteira entre componentes é um ponto candidato a ameaça na [modelagem STRIDE](../MODELAGEM_AMEACAS.md).
 
 ---
 
@@ -8,22 +8,22 @@ Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um dia
 
 **Participantes dos diagramas**
 
-| Participante           | Componente em SERVICO.md | Papel                                                                                                                                                 |
-|------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Promotor               | Usuário                  | Ator primário. Membro da promotoria autenticado no sistema                                                                                            |
-| Backend                | Backend                  | Recebe as requisições do promotor, valida sessão e permissões, orquestra os demais componentes                                                        |
-| Provedor de Identidade | Provedor de Identidade   | Serviço de autenticação institucional do Ministério Público. Valida credenciais e emite o token de identidade                                         |
-| Sistema Processos      | Sistema Processos        | Sistema do Estado que detém os dados dos processos e as mídias originais. O Backend consome sua API diretamente (componente Integração em SERVICO.md) |
-| Storage                | Storage                  | Armazena a cópia da mídia e a transcrição gerada                                                                                                      |
-| Fila                   | Enfileiramento           | Desacopla a solicitação do processamento assíncrono                                                                                                   |
-| Módulo I.A             | Módulo I.A               | Consome a fila, envia a mídia para a I.A e persiste o resultado                                                                                       |
-| I.A                    | I.A                      | Serviço externo de I.A acessado via API, usado para transcrição e chat                                                                                |
+| Participante           | Papel                                                                                                                                                 |
+|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Promotor               | Ator primário (o Usuário em SERVICO.md). Membro da promotoria autenticado no sistema                                                                  |
+| Backend                | Recebe as requisições do promotor, valida sessão e permissões, orquestra os demais componentes                                                        |
+| Provedor de Identidade | Serviço de autenticação institucional do Ministério Público. Valida credenciais e emite o token de identidade                                         |
+| Sistema Processos      | Sistema do Estado que detém os dados dos processos e as mídias originais. O Backend consome sua API diretamente (componente Integração em SERVICO.md) |
+| Storage                | Armazena a cópia da mídia e a transcrição gerada                                                                                                      |
+| Fila                   | Desacopla a solicitação do processamento assíncrono (componente Enfileiramento em SERVICO.md)                                                         |
+| Módulo I.A             | Consome a fila, envia a mídia para a I.A e persiste o resultado                                                                                       |
+| I.A                    | Serviço externo de I.A acessado via API, usado para transcrição e chat                                                                                |
 
-**Registro de transcrições.** O Backend mantém um registro com o identificador de cada transcrição, o promotor solicitante, o processo, a mídia, o caminho no Storage e o status. Nos diagramas, operações sobre esse registro aparecem como mensagens do Backend para ele mesmo. O high-level design em SERVICO.md ainda não possui um componente de persistência para esse registro.
+**Registro de transcrições.** O Backend mantém um registro com o identificador de cada transcrição, o promotor solicitante, o processo, a mídia, o caminho no Storage e o status. Nos diagramas, operações internas do Backend, como as sobre esse registro e a validação de sessão, aparecem como mensagens do Backend para ele mesmo. O high-level design em SERVICO.md ainda não possui um componente de persistência para esse registro.
 
 **Status de uma transcrição.** Os valores possíveis são `na fila`, `em processamento`, `finalizada` e `falha`. As transições ocorrem em RQF3 e RQF4.
 
-**Validação de sessão.** Em toda requisição do promotor, o Backend valida o token de sessão emitido em RQF1. Quando a validação falha, o Backend responde com erro de sessão inválida e o fluxo termina. Essa etapa aparece nos diagramas como uma mensagem do Backend para ele mesmo.
+**Validação de sessão.** Em toda requisição do promotor, o Backend valida o token de sessão emitido em RQF1. Quando a validação falha, o Backend responde com erro de sessão inválida e o fluxo termina.
 
 **Premissas adotadas**
 
@@ -31,8 +31,8 @@ Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um dia
 2. O Módulo I.A informa o Backend sobre mudanças de status da transcrição.
 3. No chat, o Backend chama a I.A diretamente, sem passar pelo Módulo I.A nem pela fila.
 4. O Backend gera o arquivo .docx sob demanda a partir da transcrição armazenada no Storage.
-5. As mídias vêm do Sistema Processos, sistema externo do Estado. Como elas entram lá é responsabilidade de terceiros e está fora do escopo deste serviço. O acesso acontece somente pela API do Sistema Processos, que o Backend chama diretamente, com três operações: consultar processo e listar mídias, consultar metadados de uma mídia e buscar o arquivo de uma mídia. O serviço nunca escreve no Sistema Processos e confia na decisão de autorização por processo que esse sistema retorna. Não confia, porém, no conteúdo do arquivo recebido: o Backend valida formato, tamanho declarado e ausência de conteúdo malicioso antes de copiar a mídia para o Storage.
-6. A identidade do promotor é institucional: ele se autentica no provedor de identidade do Ministério Público (SSO). Este serviço não possui cadastro próprio de usuários, não permite auto-cadastro e não gerencia senhas. O cadastro e a desativação de promotores acontecem no provedor de identidade. O Backend apenas valida o token de identidade emitido pelo provedor e cria a sessão local.
+5. As mídias vêm do Sistema Processos. O Backend as acessa pela API desse sistema, com três operações: consultar processo e listar mídias, consultar metadados de uma mídia e buscar o arquivo de uma mídia. O serviço confia na decisão de autorização por processo que essa API retorna. Não confia, porém, no conteúdo do arquivo recebido: o Backend valida formato, tamanho declarado e ausência de conteúdo malicioso antes de copiar a mídia para o Storage.
+6. O Backend apenas valida o token de identidade emitido pelo provedor de identidade e cria a sessão local. O papel do provedor e o que fica fora do escopo deste serviço estão em SERVICO.md.
 
 ---
 
@@ -56,26 +56,26 @@ Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um dia
 
 ### 3. Telas de referência
 
-Mockups de baixa fidelidade, só para o leitor visualizar cada requisito. Não são o design final. Cada requisito funcional aponta para pelo menos uma tela. Quando uma tela atende mais de um requisito, o arquivo do requisito usa a variante `<tela>--RQFn.png`, que destaca em azul o elemento daquele requisito. A tabela abaixo lista as imagens base, sem destaque.
+Mockups de baixa fidelidade, para referência, não o design final. A variante `<tela>--RQFn.png` destaca em azul o elemento do requisito na tela.
 
-| Tela | Nome | Requisitos | Imagem |
-| --- | --- | --- | --- |
-| T1 | Entrada | RQF1 | [T1-entrada.png](../resources/mockups/T1-entrada.png) |
-| T2 | Processo | RQF2 | [T2-processo.png](../resources/mockups/T2-processo.png) |
-| T2b | Transcrição solicitada | RQF3 | [T2b-transcricao-solicitada.png](../resources/mockups/T2b-transcricao-solicitada.png) |
-| T3 | Minhas transcrições | RQF4, RQF5 | [T3-minhas-transcricoes.png](../resources/mockups/T3-minhas-transcricoes.png) |
-| T3b | Confirmar exclusão | RQF9 | [T3b-confirmar-exclusao.png](../resources/mockups/T3b-confirmar-exclusao.png) |
-| T4 | Transcrição | RQF6, RQF7, RQF8 | [T4-transcricao.png](../resources/mockups/T4-transcricao.png) |
-| T5 | Chat com a I.A | RQF7, RQF10 | [T5-chat.png](../resources/mockups/T5-chat.png) |
-| T6 | Sessão encerrada | RQF11 | [T6-sessao-encerrada.png](../resources/mockups/T6-sessao-encerrada.png) |
+| Tela | Nome                                                                          | Requisitos       |
+|------|-------------------------------------------------------------------------------|------------------|
+| T1   | [Entrada](../resources/mockups/T1-entrada.png)                                | RQF1             |
+| T2   | [Processo](../resources/mockups/T2-processo.png)                              | RQF2             |
+| T2b  | [Transcrição solicitada](../resources/mockups/T2b-transcricao-solicitada.png) | RQF3             |
+| T3   | [Minhas transcrições](../resources/mockups/T3-minhas-transcricoes.png)        | RQF4, RQF5       |
+| T3b  | [Confirmar exclusão](../resources/mockups/T3b-confirmar-exclusao.png)         | RQF9             |
+| T4   | [Transcrição](../resources/mockups/T4-transcricao.png)                        | RQF6, RQF7, RQF8 |
+| T5   | [Chat com a I.A](../resources/mockups/T5-chat.png)                            | RQF7, RQF10      |
+| T6   | [Sessão encerrada](../resources/mockups/T6-sessao-encerrada.png)              | RQF11            |
 
 ---
 
 ### 4. Manutenção deste documento
 
-- Ao incluir, alterar ou remover um requisito funcional em REQUISITOS.md, criar, alterar ou remover o arquivo correspondente nesta pasta e atualizar a tabela do índice. O nome do arquivo segue o padrão `RQFn-nome-do-caso.md` (minúsculas, sem acentos, hífens) e o heading do arquivo começa com o código do requisito, pois o script de renderização usa esse heading para nomear o PNG.
-- `npm run diagramas` gera os PNGs em `resources/diagramas/` a partir dos arquivos desta pasta (requer Node.js e, na primeira vez, `npm install`). Regenerar após qualquer alteração em um diagrama. `--classic` desliga o estilo sketch. Cada arquivo exibe o PNG e mantém o código mermaid em um bloco recolhível, que é a fonte do diagrama.
-- As telas vivem em `mockups/*.html` com o estilo em `mockups/estilo.css`. `npm run mockups` gera os PNGs em `resources/mockups/`. Regenerar após qualquer alteração em uma tela. Os elementos de cada requisito são marcados no HTML com `data-rqf="RQFn"`, e o script gera uma variante destacada por código encontrado. Ao criar uma tela, adicionar a linha na tabela da seção 3 e a referência no arquivo do requisito.
+- Toda mudança em um requisito funcional de REQUISITOS.md se reflete no arquivo correspondente desta pasta e na tabela do índice. O nome do arquivo segue o padrão `RQFn-nome-do-caso.md` (minúsculas, sem acentos, hífens). O heading começa com o código do requisito, pois o script de renderização usa esse heading para nomear o PNG.
+- O bloco mermaid recolhível de cada arquivo é a fonte do diagrama. Após alterá-lo, rode `npm run diagramas` (na primeira vez, `npm install`) para regerar o PNG em `resources/diagramas/`. `--classic` desliga o estilo sketch.
+- As telas são `mockups/*.html`, com o estilo em `mockups/estilo.css`. Após alterar uma tela, rode `npm run mockups` para regerar os PNGs em `resources/mockups/`. Elementos marcados com `data-rqf="RQFn"` geram a variante destacada daquele requisito. Uma tela nova entra na tabela da seção 3 e no arquivo do requisito.
 - Ao alterar a tabela de componentes em SERVICO.md, atualizar a tabela de participantes na seção 1 e os nomes usados nos diagramas.
 - Ao resolver uma premissa da seção 1, remover a premissa e ajustar os diagramas afetados.
-- Cada ameaça em MODELAGEM_AMEACAS.md deve apontar para um RQF deste documento. Se uma ameaça não encontrar interação correspondente em nenhum diagrama, o diagrama está incompleto.
+- Cada ameaça em MODELAGEM_AMEACAS.md aponta para um RQF desta pasta. Uma ameaça sem interação correspondente no diagrama daquele RQF indica que o diagrama está incompleto.

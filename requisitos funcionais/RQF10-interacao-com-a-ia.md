@@ -2,11 +2,9 @@
 
 Convenções, participantes e premissas estão no [README](README.md) desta pasta.
 
-**Ator:** Promotor.
-
 **Pré-condições:** existe uma sessão de chat criada em RQF7.
 
-**Pós-condições:** ao encerrar o chat, o Backend descartou o contexto e o histórico (RQNF3.3).
+**Pós-condições:** após o encerramento do chat, não resta contexto nem histórico no Backend (RQNF3.3).
 
 **Tela de referência:** T5 Chat com a I.A.
 
@@ -42,4 +40,4 @@ sequenceDiagram
 
 </details>
 
-**Notas:** a transcrição inteira e as perguntas do promotor trafegam para a I.A externa a cada mensagem. Esse é o principal ponto de exposição do ativo A6.
+**Notas:** a transcrição inteira e as perguntas do promotor trafegam para a I.A externa a cada mensagem. É o principal ponto de exposição do ativo A6.

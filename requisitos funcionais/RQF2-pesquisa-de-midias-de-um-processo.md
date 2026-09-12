@@ -2,11 +2,9 @@
 
 Convenções, participantes e premissas estão no [README](README.md) desta pasta.
 
-**Ator:** Promotor.
-
 **Pré-condições:** sessão ativa. O promotor conhece o número do processo.
 
-**Pós-condições:** o promotor visualiza a lista de mídias do processo ou recebe o motivo pelo qual ela não foi exibida.
+**Pós-condições:** em caso de sucesso, o promotor tem a lista de mídias do processo.
 
 **Tela de referência:** T2 Processo.
 
