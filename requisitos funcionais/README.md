@@ -19,7 +19,7 @@ Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um dia
 | Módulo I.A             | Consome a fila, envia a mídia para a I.A e persiste o resultado                                                                                       |
 | I.A                    | Serviço externo de I.A acessado via API, usado para transcrição e chat                                                                                |
 
-**Registro de transcrições.** O Backend mantém um registro com o identificador de cada transcrição, o promotor solicitante, o processo, a mídia, o caminho no Storage e o status. Nos diagramas, operações internas do Backend, como as sobre esse registro e a validação de sessão, aparecem como mensagens do Backend para ele mesmo. O high-level design em SERVICO.md ainda não possui um componente de persistência para esse registro.
+**Registro de transcrições.** O Backend mantém um registro com o identificador de cada transcrição, o promotor solicitante, o processo, a mídia, o caminho no Storage, os hashes da mídia e do texto (RQNF6.1, RQNF6.3) e o status. Nos diagramas, operações internas do Backend, como as sobre esse registro e a validação de sessão, aparecem como mensagens do Backend para ele mesmo. O high-level design em SERVICO.md ainda não possui um componente de persistência para esse registro.
 
 **Status de uma transcrição.** Os valores possíveis são `na fila`, `em processamento`, `finalizada` e `falha`. As transições ocorrem em RQF3 e RQF4.
 

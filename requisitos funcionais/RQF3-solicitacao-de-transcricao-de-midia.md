@@ -34,13 +34,20 @@ sequenceDiagram
         else Mídia dentro do limite
             B->>SP: Solicita arquivo da mídia
             SP-->>B: Arquivo da mídia
-            B->>B: Valida formato e tamanho real do arquivo
+            B->>B: Valida formato, tamanho real e antimalware (RQNF6.5)
+            B->>B: Calcula hash SHA-256 da mídia (RQNF6.1)
             B->>S: Upload da mídia
             S-->>B: Confirmação com caminho no Storage
-            B->>B: Cria registro com status "na fila"
-            B->>F: Publica mensagem (id da transcrição, caminho no Storage, promotor)
+            B->>B: Cria registro com status "na fila" e o hash
+            B->>F: Publica mensagem (id da transcrição, caminho no Storage, hash, promotor)
             Note over B,F: Fila escolhida pelo tamanho da mídia (RQNF4.4)
-            B-->>P: Confirma solicitação e retorna id da transcrição
+            alt Fila confirmou
+                B-->>P: Confirma solicitação e retorna id da transcrição
+            else Publicação falhou após 3 tentativas (RQNF5.4)
+                B->>S: Remove a cópia da mídia
+                B->>B: Atualiza status "falha" com motivo
+                B-->>P: Informa falha na solicitação
+            end
         end
     end
 ```

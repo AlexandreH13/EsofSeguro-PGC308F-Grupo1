@@ -25,21 +25,28 @@ sequenceDiagram
     participant IA as I.A
     par Processamento assíncrono
         M->>F: Consome mensagem
-        F-->>M: Mensagem (id da transcrição, caminho no Storage)
+        F-->>M: Mensagem (id da transcrição, caminho no Storage, hash)
         M->>B: Atualiza status "em processamento"
         M->>S: Baixa mídia
         S-->>M: Arquivo da mídia
-        M->>IA: Envia mídia para transcrição
-        alt Transcrição concluída
-            IA-->>M: Texto transcrito
-            M->>M: Formata transcrição
-            M->>S: Salva transcrição
-            S-->>M: Confirmação com caminho no Storage
-            M->>B: Atualiza status "finalizada"
-        else Falha na I.A ou tempo acima de 1 hora (RQNF3.2)
-            M->>B: Atualiza status "falha" com motivo
+        M->>M: Recalcula o hash e compara com o da mensagem (RQNF6.1)
+        alt Hash diverge
+            M->>B: Atualiza status "falha" com motivo "mídia alterada"
+        else Hash confere
+            loop Até 3 novas tentativas com espera crescente (RQNF5.3)
+                M->>IA: Envia mídia para transcrição
+            end
+            alt Transcrição concluída
+                IA-->>M: Texto transcrito
+                M->>M: Formata transcrição e calcula hash do texto
+                M->>S: Salva transcrição
+                S-->>M: Confirmação com caminho no Storage
+                M->>B: Atualiza status "finalizada" com o hash do texto
+            else Tentativas esgotadas ou tempo acima de 1 hora (RQNF3.2, RQNF5.3)
+                M->>B: Atualiza status "falha" com motivo
+            end
         end
-        M->>F: Confirma consumo da mensagem
+        M->>F: Confirma consumo da mensagem (RQNF5.1)
     and Acompanhamento pelo promotor
         loop Enquanto status for "na fila" ou "em processamento"
             P->>B: Consulta status (id da transcrição)

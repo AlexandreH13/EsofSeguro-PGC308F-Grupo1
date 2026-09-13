@@ -30,10 +30,16 @@ sequenceDiagram
         B->>S: Busca arquivo da transcrição
         alt Arquivo encontrado
             S-->>B: Conteúdo da transcrição
-            B-->>P: Exibe transcrição
+            B->>B: Confere o hash do texto com o registrado (RQNF6.3)
+            alt Hash confere
+                B-->>P: Exibe transcrição
+            else Hash diverge
+                B->>B: Atualiza status "falha" com motivo "conteúdo alterado" e gera evento de auditoria
+                B-->>P: Erro, transcrição indisponível
+            end
         else Arquivo ausente
             S-->>B: Não encontrado
-            B->>B: Atualiza status "falha" com motivo "arquivo ausente"
+            B->>B: Atualiza status "falha" com motivo "arquivo ausente" e gera evento de auditoria
             B-->>P: Erro, transcrição indisponível
         end
     end
