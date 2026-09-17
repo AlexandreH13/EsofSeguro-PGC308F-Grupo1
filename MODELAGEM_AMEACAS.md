@@ -17,7 +17,10 @@ Na tabela abaixo será detalhado todas as ameaças identificadas no sistema. Foi
 | AME10 | Usuário força retries na IA                   | Denial of Service | A3, A6           | RQNF5.3                   | Um usuário força repetidamente falhas na I.A, como por exemplo mídias inválidas ou corrompidas, para adicionar ciclos de retries, levando a um erro de cota ou rate limite. Comumente chamado também de resource exhausted. |
 | AME11 | Esgotamento de Storage                    | Denial of Service | A3           | RQF3, RQNF4.2                   | Um promotor solicita repetidamente transcrição de várias mídias grandes (até o limite de 80MB cada) sem haver limpeza, enchendo o Storage e impedindo novas cópias de mídia para qualquer usuário. |
 | AME12 | Sobrecarga de perguntas no chat com a I.A                    | Denial of Service | A6           | RQF10, RQNF3.3                   | Um promotor abre múltiplas sessões de chat ou envia perguntas em alta frequência, esgotando a cota/rate limit da I.A externa ou a memória do Backend que guarda o histórico em memória, degradando o chat para outros usuários. |
-
+| AME13 | Falsificação de identidade de um promotor | Spoofing | A1 | RQF1 | Um atacante obtém ou reutiliza credenciais ou tokens de um promotor e consegue se autenticar no sistema como se fosse o usuário legítimo. |
+| AME14 | Adulteração de dados da transcrição | Tampering | A2, A4 | RQF4, RQF7, RQNF6.2 | Um atacante consegue modificar uma transcrição ou seus metadados após sua geração. Se o sistema não validar a integridade do conteúdo, o usuário pode receber uma transcrição alterada. |
+| AME15 | Adulteração de mídia antes da transcrição | Tampering | A3, A5 | RQF3, RQNF6.1, RQNF6.5 | Uma mídia armazenada é substituída ou modificada antes de ser processada pelo Módulo I.A. Sem validação de integridade, o sistema pode transcrever um conteúdo diferente daquele originalmente solicitado. |
+| AME16 | Adulteração de mensagens da fila | Tampering | A2, A3, A5 | RQF4, RQNF6.1 | Um atacante com acesso à fila modifica uma mensagem de transcrição, alterando informações como identificador ou caminho da mídia. O Módulo I.A pode processar um conteúdo diferente do solicitado. |
 ---
 
 ### 2. Casos de Abuso
