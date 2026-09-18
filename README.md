@@ -31,3 +31,4 @@ npm run mockups
 ```
 
 * O documento [etapa1-modelagem-ameacas.md](docs/etapa1-modelagem-ameacas.md) possui a modelagem das ameaças utilizando o framework STRIDE.
+* O documento [etapa2-analise-de-risco.md](docs/etapa2-analise-de-risco.md) possui o levantamento e classificação dos riscos.
