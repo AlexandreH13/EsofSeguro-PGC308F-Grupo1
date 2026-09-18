@@ -8,9 +8,9 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Tela de referência:** T5 Chat com a I.A.
 
-![T5 Chat com a I.A](../resources/mockups/T5-chat--RQF10.png)
+![T5 Chat com a I.A](../../resources/mockups/T5-chat--RQF10.png)
 
-![RQF10](../resources/diagramas/RQF10.png)
+![RQF10](../../resources/diagramas/RQF10.png)
 
 <details>
 <summary>Código mermaid</summary>

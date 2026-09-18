@@ -8,11 +8,11 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Telas de referência:** T4 Transcrição e T5 Chat com a I.A.
 
-![T4 Transcrição](../resources/mockups/T4-transcricao--RQF7.png)
+![T4 Transcrição](../../resources/mockups/T4-transcricao--RQF7.png)
 
-![T5 Chat com a I.A](../resources/mockups/T5-chat--RQF7.png)
+![T5 Chat com a I.A](../../resources/mockups/T5-chat--RQF7.png)
 
-![RQF7](../resources/diagramas/RQF7.png)
+![RQF7](../../resources/diagramas/RQF7.png)
 
 <details>
 <summary>Código mermaid</summary>

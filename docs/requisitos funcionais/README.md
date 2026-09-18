@@ -1,6 +1,6 @@
 ## Casos de Uso
 
-Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um diagrama de sequência em um arquivo próprio nesta pasta. Os diagramas mostram as interações entre os componentes descritos em [SERVICO.md](../SERVICO.md), pois cada interação e cada fronteira entre componentes é um ponto candidato a ameaça na [modelagem STRIDE](../MODELAGEM_AMEACAS.md).
+Cada requisito funcional listado em [requisitos.md](../requisitos.md) tem um diagrama de sequência em um arquivo próprio nesta pasta. Os diagramas mostram as interações entre os componentes descritos em [servico.md](../servico.md), pois cada interação e cada fronteira entre componentes é um ponto candidato a ameaça na [modelagem STRIDE](../etapa1-modelagem-ameacas.md).
 
 ---
 
@@ -10,16 +10,16 @@ Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um dia
 
 | Participante           | Papel                                                                                                                                                 |
 |------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Promotor               | Ator primário (o Usuário em SERVICO.md). Membro da promotoria autenticado no sistema                                                                  |
+| Promotor               | Ator primário (o Usuário em servico.md). Membro da promotoria autenticado no sistema                                                                  |
 | Backend                | Recebe as requisições do promotor, valida sessão e permissões, orquestra os demais componentes                                                        |
 | Provedor de Identidade | Serviço de autenticação institucional do Ministério Público. Valida credenciais e emite o token de identidade                                         |
-| Sistema Processos      | Sistema do Estado que detém os dados dos processos e as mídias originais. O Backend consome sua API diretamente (componente Integração em SERVICO.md) |
+| Sistema Processos      | Sistema do Estado que detém os dados dos processos e as mídias originais. O Backend consome sua API diretamente (componente Integração em servico.md) |
 | Storage                | Armazena a cópia da mídia e a transcrição gerada                                                                                                      |
-| Fila                   | Desacopla a solicitação do processamento assíncrono (componente Enfileiramento em SERVICO.md)                                                         |
+| Fila                   | Desacopla a solicitação do processamento assíncrono (componente Enfileiramento em servico.md)                                                         |
 | Módulo I.A             | Consome a fila, envia a mídia para a I.A e persiste o resultado                                                                                       |
 | I.A                    | Serviço externo de I.A acessado via API, usado para transcrição e chat                                                                                |
 
-**Registro de transcrições.** O Backend mantém um registro com o identificador de cada transcrição, o promotor solicitante, o processo, a mídia, o caminho no Storage, os hashes da mídia e do texto (RQNF6.1, RQNF6.3) e o status. Nos diagramas, operações internas do Backend, como as sobre esse registro e a validação de sessão, aparecem como mensagens do Backend para ele mesmo. O high-level design em SERVICO.md ainda não possui um componente de persistência para esse registro.
+**Registro de transcrições.** O Backend mantém um registro com o identificador de cada transcrição, o promotor solicitante, o processo, a mídia, o caminho no Storage, os hashes da mídia e do texto (RQNF6.1, RQNF6.3) e o status. Nos diagramas, operações internas do Backend, como as sobre esse registro e a validação de sessão, aparecem como mensagens do Backend para ele mesmo. O high-level design em servico.md ainda não possui um componente de persistência para esse registro.
 
 **Status de uma transcrição.** Os valores possíveis são `na fila`, `em processamento`, `finalizada` e `falha`. As transições ocorrem em RQF3 e RQF4.
 
@@ -32,7 +32,7 @@ Cada requisito funcional listado em [REQUISITOS.md](../REQUISITOS.md) tem um dia
 3. No chat, o Backend chama a I.A diretamente, sem passar pelo Módulo I.A nem pela fila.
 4. O Backend gera o arquivo .docx sob demanda a partir da transcrição armazenada no Storage.
 5. As mídias vêm do Sistema Processos. O Backend as acessa pela API desse sistema, com três operações: consultar processo e listar mídias, consultar metadados de uma mídia e buscar o arquivo de uma mídia. O serviço confia na decisão de autorização por processo que essa API retorna. Não confia, porém, no conteúdo do arquivo recebido: o Backend valida formato, tamanho declarado e ausência de conteúdo malicioso antes de copiar a mídia para o Storage.
-6. O Backend apenas valida o token de identidade emitido pelo provedor de identidade e cria a sessão local. O papel do provedor e o que fica fora do escopo deste serviço estão em SERVICO.md.
+6. O Backend apenas valida o token de identidade emitido pelo provedor de identidade e cria a sessão local. O papel do provedor e o que fica fora do escopo deste serviço estão em servico.md.
 
 ---
 
@@ -60,11 +60,11 @@ Mockups de baixa fidelidade, para referência, não o design final. A variante `
 
 | Tela | Nome                                                                          | Requisitos       |
 |------|-------------------------------------------------------------------------------|------------------|
-| T1   | [Entrada](../resources/mockups/T1-entrada.png)                                | RQF1             |
-| T2   | [Processo](../resources/mockups/T2-processo.png)                              | RQF2             |
-| T2b  | [Transcrição solicitada](../resources/mockups/T2b-transcricao-solicitada.png) | RQF3             |
-| T3   | [Minhas transcrições](../resources/mockups/T3-minhas-transcricoes.png)        | RQF4, RQF5       |
-| T3b  | [Confirmar exclusão](../resources/mockups/T3b-confirmar-exclusao.png)         | RQF9             |
-| T4   | [Transcrição](../resources/mockups/T4-transcricao.png)                        | RQF6, RQF7, RQF8 |
-| T5   | [Chat com a I.A](../resources/mockups/T5-chat.png)                            | RQF7, RQF10      |
-| T6   | [Sessão encerrada](../resources/mockups/T6-sessao-encerrada.png)              | RQF11            |
+| T1   | [Entrada](../../resources/mockups/T1-entrada.png)                                | RQF1             |
+| T2   | [Processo](../../resources/mockups/T2-processo.png)                              | RQF2             |
+| T2b  | [Transcrição solicitada](../../resources/mockups/T2b-transcricao-solicitada.png) | RQF3             |
+| T3   | [Minhas transcrições](../../resources/mockups/T3-minhas-transcricoes.png)        | RQF4, RQF5       |
+| T3b  | [Confirmar exclusão](../../resources/mockups/T3b-confirmar-exclusao.png)         | RQF9             |
+| T4   | [Transcrição](../../resources/mockups/T4-transcricao.png)                        | RQF6, RQF7, RQF8 |
+| T5   | [Chat com a I.A](../../resources/mockups/T5-chat.png)                            | RQF7, RQF10      |
+| T6   | [Sessão encerrada](../../resources/mockups/T6-sessao-encerrada.png)              | RQF11            |

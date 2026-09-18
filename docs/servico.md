@@ -60,4 +60,4 @@ A tabela abaixo descreve cada componente ilustrado no digrama high-level da apli
 | Módulo I.A | Serviço python que "escuta" a fila e gerencia as requisições de transcrição. Envia a mídia para a I.A degravar e formata a saída para persistir a transcrição no formato ideal.
 | I.A | Serviço de I.A utilizado via API |
 
-![hld](resources/hldesign.png)
+![hld](../resources/hldesign.png)

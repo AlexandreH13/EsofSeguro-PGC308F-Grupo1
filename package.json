@@ -4,7 +4,7 @@
   "description": "Documentação do trabalho de Engenharia de Software Seguro. Scripts auxiliares para gerar os diagramas.",
   "type": "module",
   "scripts": {
-    "diagramas": "node scripts/render_diagramas.mjs",
+    "diagramas": "node scripts/render_diagramas.mjs --input \"docs/requisitos funcionais\"",
     "mockups": "node scripts/render_mockups.mjs"
   },
   "devDependencies": {
