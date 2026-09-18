@@ -22,7 +22,7 @@
 
 ### Análise de riscos (Etapa 2) - Aula do dia 17/09
 
-Aqui, para cada ameaça que levantamos na [modelagem de ameaças](MODELAGEM_AMEACAS.md) (no total são 16), precisamos fazer uma análise em **duas dimensões: Probabilidade e Impacto**. Abaixo está mais detalhado com alguns exemplos.
+Aqui, para cada ameaça que levantamos na [modelagem de ameaças](docs/etapa1-modelagem-ameacas.md) (no total são 16), precisamos fazer uma análise em **duas dimensões: Probabilidade e Impacto**. Abaixo está mais detalhado com alguns exemplos.
 
 Mas para essa análise será necessário primeiro definir os critérios de avaliação. Esses critérios são notas. Podemos por exemplo atribuir valores entre 1-4 tanto para probabilidade quanto para impacto (quanto maior a nota maior a probabilidade e o impacto).
 

@@ -8,9 +8,9 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Tela de referência:** T6 Sessão encerrada.
 
-![T6 Sessão encerrada](../resources/mockups/T6-sessao-encerrada--RQF11.png)
+![T6 Sessão encerrada](../../resources/mockups/T6-sessao-encerrada--RQF11.png)
 
-![RQF11](../resources/diagramas/RQF11.png)
+![RQF11](../../resources/diagramas/RQF11.png)
 
 <details>
 <summary>Código mermaid</summary>

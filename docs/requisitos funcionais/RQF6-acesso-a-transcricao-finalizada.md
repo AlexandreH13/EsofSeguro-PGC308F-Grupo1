@@ -8,9 +8,9 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Tela de referência:** T4 Transcrição.
 
-![T4 Transcrição](../resources/mockups/T4-transcricao--RQF6.png)
+![T4 Transcrição](../../resources/mockups/T4-transcricao--RQF6.png)
 
-![RQF6](../resources/diagramas/RQF6.png)
+![RQF6](../../resources/diagramas/RQF6.png)
 
 <details>
 <summary>Código mermaid</summary>

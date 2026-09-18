@@ -8,9 +8,9 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Tela de referência:** T2b Transcrição solicitada.
 
-![T2b Transcrição solicitada](../resources/mockups/T2b-transcricao-solicitada--RQF3.png)
+![T2b Transcrição solicitada](../../resources/mockups/T2b-transcricao-solicitada--RQF3.png)
 
-![RQF3](../resources/diagramas/RQF3.png)
+![RQF3](../../resources/diagramas/RQF3.png)
 
 <details>
 <summary>Código mermaid</summary>

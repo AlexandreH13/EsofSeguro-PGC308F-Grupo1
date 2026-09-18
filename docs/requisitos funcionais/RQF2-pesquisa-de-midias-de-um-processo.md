@@ -8,9 +8,9 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Tela de referência:** T2 Processo.
 
-![T2 Processo](../resources/mockups/T2-processo--RQF2.png)
+![T2 Processo](../../resources/mockups/T2-processo--RQF2.png)
 
-![RQF2](../resources/diagramas/RQF2.png)
+![RQF2](../../resources/diagramas/RQF2.png)
 
 <details>
 <summary>Código mermaid</summary>

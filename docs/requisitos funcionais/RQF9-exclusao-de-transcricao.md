@@ -8,9 +8,9 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Tela de referência:** T3b Confirmar exclusão.
 
-![T3b Confirmar exclusão](../resources/mockups/T3b-confirmar-exclusao--RQF9.png)
+![T3b Confirmar exclusão](../../resources/mockups/T3b-confirmar-exclusao--RQF9.png)
 
-![RQF9](../resources/diagramas/RQF9.png)
+![RQF9](../../resources/diagramas/RQF9.png)
 
 <details>
 <summary>Código mermaid</summary>
