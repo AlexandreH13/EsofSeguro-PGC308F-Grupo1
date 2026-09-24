@@ -8,9 +8,9 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Tela de referência:** T3 Minhas transcrições.
 
-![T3 Minhas transcrições](../resources/mockups/T3-minhas-transcricoes--RQF5.png)
+![T3 Minhas transcrições](../../resources/mockups/T3-minhas-transcricoes--RQF5.png)
 
-![RQF5](../resources/diagramas/RQF5.png)
+![RQF5](../../resources/diagramas/RQF5.png)
 
 <details>
 <summary>Código mermaid</summary>

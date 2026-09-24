@@ -8,9 +8,9 @@ Convenções, participantes e premissas estão no [README](README.md) desta past
 
 **Tela de referência:** T1 Entrada.
 
-![T1 Entrada](../resources/mockups/T1-entrada--RQF1.png)
+![T1 Entrada](../../resources/mockups/T1-entrada--RQF1.png)
 
-![RQF1](../resources/diagramas/RQF1.png)
+![RQF1](../../resources/diagramas/RQF1.png)
 
 <details>
 <summary>Código mermaid</summary>

@@ -1,6 +1,6 @@
 ### A fazer
 
-#### Modelagem de Ameaças - Entrega 16/09 (quarta-feira)
+#### Modelagem de Ameaças (Etapa 1) - Entrega 16/09 (quarta-feira)
 
 * Carlos: 
     - Stride: Modelar o "S" e o "T". 
@@ -18,9 +18,23 @@
     - Stride: Modelar o "E"
     - Expandir requisitos não funcionais: Confiabilidade e Integridade
 
+---
 
-### Ameaças
-# TODO — Análise de Ameaças
+### Análise de riscos (Etapa 2) - Aula do dia 17/09
+
+Aqui, para cada ameaça que levantamos na [modelagem de ameaças](docs/etapa1-modelagem-ameacas.md) (no total são 16), precisamos fazer uma análise em **duas dimensões: Probabilidade e Impacto**. Abaixo está mais detalhado com alguns exemplos.
+
+Mas para essa análise será necessário primeiro definir os critérios de avaliação. Esses critérios são notas. Podemos por exemplo atribuir valores entre 1-4 tanto para probabilidade quanto para impacto (quanto maior a nota maior a probabilidade e o impacto).
+
+Uma vez que temos as notas das probabilidades e dos impactos, calculamos a nota do risco. Segundo o que foi dito em aula, o cálculo é uma multiplicação:
+
+$r = p.i$\
+onde\
+$r=risco, p=probabilidade, i=impacto$
+
+Com a nota atribuída ao risco, nós discretizamos os valores, por exemplo, nota entre 1-4 é risco baixo, entre 5-8 é risco médio, entre 9-12 é risco alto e entre 13-16 é muito alto.
+
+O projeto de exemplo compartilhado pelo professor pode servir de inspiração: https://github.com/camillabdt/VitaLink
 
 ## 1. Identificar ameaças
 
@@ -101,3 +115,18 @@ Para cada ameaça, registrar:
 - [ ] Avaliar ataques que exigiriam comprometimento simultâneo de múltiplas camadas de segurança.
 - [ ] Avaliar quebra de criptografia considerada segura com a tecnologia atualmente disponível.
 - [ ] Documentar que determinados cenários possuem baixa probabilidade, mas podem apresentar impacto crítico.
+
+### Exemplo de tabela para definir os critérios de avaliação
+
+| Nota | Classificação |
+| --- | --- |
+| 1 a 4 | BAIXO |
+| 5 a 8 | MÉDIO |
+| 9 a 12 | ALTO |
+| 13 a 16 | MUITO ALTO |
+
+### Exemplo de tabela de registro dos riscos
+
+| Código | Nome | Descrição | Vulnerabilidade | Ameaça | Probabilidade | Impacto | Classificação |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| RI01 | Risco 01 | Descrição do risco | Qual vulnerabilidade associada (falta de qual mecânismo) | Qual a ameaça (da tabela das ameaças) está associado. Ex: AME1 | 4 | 4 | MUITO ALTO |
