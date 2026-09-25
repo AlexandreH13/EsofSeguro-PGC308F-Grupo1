@@ -1,0 +1,56 @@
+## Estratégias para tratamento dos riscos
+
+### Descrição
+
+Neste documento será implementado a estratégia para mitigação dos riscos já levantados [neste documento](etapa2-analise-de-risco.md). Para isso iresmos utilizar o framework NIST CSF 2.0. Este documento tem como objetivo responder para cada risco levantado **o que fazer** com o mesmo.
+
+---
+
+### As funções do NIST
+
+A tabela abaixo detalha as **funções** sugeridas pelo framework NIST CSF 2.0.
+
+
+| Função | Descrição |
+| --- | --- |
+| Govern | Define as políticas, responsabilidades e pessoas que devem tratar cada risco. |
+| Identify | Identificar os ativos, dependências, vulnerabilidades e riscos. |
+| Protect | Implementar salvaguardas para mitigar a probabilidade ou o impacto, ou ambos. |
+| Detect | Identificar eventos suspeitos. Uso de logs e monitoramento. |
+| Respond | Após a identificação, como responder a um evento suspeito ou malicioso? Conter a ameaça, analisar e tratar. |
+| Recover | Quando um evento malicioso acontece, como reverter o prejuízo? |
+
+---
+
+### Estratégias de tratamento
+
+Descrição resumida das  estratégias que podem ser adotadas para tratamento de cada risco
+
+| Estratégia | Descrição |
+| --- | --- |
+| Evitar | Eliminar a funcionalidade ou condição que permite o risco. |
+| Reduzir | Implementar mecanismos que mitigam a probabilidade ou o impacto do risco. |
+| Compartilhar | Compartilhar com terceiros a responsabilidade e tratamento do risco. |
+| Aceitar | Aceitar a existência do risco. Decisão consciente. No entanto, mantém o risco monitorado. |
+
+---
+
+### Plano de tratamento dos riscos
+
+A tabela abaixo contém o plano concreto para tratamento de cada risco e todas as informações necessárias.
+
+| Risco | Estratégia | Controle | Função NIST CSF 2.0 | Responsáveis | Evidência necessária | Risco residual |
+| --- | --- | --- | --- | --- | --- | --- |
+| RI01 | Reduzir (Associar com a tabela anterior) | Controle é o mecânismo que será implementado para mitiar. | Protect (Associar com função da tabela de funções NIST) | Equipe de desenvolvimento | Evidência de que controle foi implementado | ALTO (Aqui é o quanto reduziu o risco. Neste exemplo era MUITO ALTO e caiu para ALTO) |
+
+---
+
+### Ordem inicial de implementação
+
+**Descrição**: Precisamos de uma tabela que descreva qual será a ordem de implemetação das estratégias de maneira resumida. Olhar como exemplo o repositório (https://github.com/camillabdt/VitaLink/blob/main/docs/etapa2-riscos-e-tratamento.md).
+
+---
+
+### Conclusão
+
+Fazer uma consideração final das estratégias que levantamos para o tratamento dos riscos.
