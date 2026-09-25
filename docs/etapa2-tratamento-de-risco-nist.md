@@ -41,7 +41,10 @@ A tabela abaixo contém o plano concreto para tratamento de cada risco e todas a
 
 | Risco | Estratégia | Controle | Função NIST CSF 2.0 | Responsáveis | Evidência necessária | Risco residual |
 | --- | --- | --- | --- | --- | --- | --- |
-| RI01 | Reduzir (Associar com a tabela anterior) | Controle é o mecânismo que será implementado para mitiar. | Protect (Associar com função da tabela de funções NIST) | Equipe de desenvolvimento | Evidência de que controle foi implementado | ALTO (Aqui é o quanto reduziu o risco. Neste exemplo era MUITO ALTO e caiu para ALTO) |
+| RI01 | Reduzir | Implementar autorização por objeto no Backend, validando se a transcrição solicitada pertence ao promotor autenticado antes de permitir visualização, download, exclusão ou uso no chat. | Protect | Equipe de desenvolvimento | Testes demonstrando que um promotor não consegue acessar transcrições pertencentes a outro promotor; validação do código de autorização. | BAIXO |
+| RI02 | Reduzir | O Backend deve utilizar exclusivamente a identidade do promotor obtida da sessão autenticada ao realizar consultas ao Sistema Processos, impedindo que a identidade seja definida por parâmetros enviados pelo cliente. | Protect | Equipe de desenvolvimento | Testes de autorização demonstrando que a alteração da identidade na requisição não permite acesso a processos de outro promotor; registros das requisições realizadas pelo Backend. | BAIXO |
+| RI03 | Reduzir | Validar, além da assinatura e do emissor do token, a audiência (audience) e o papel/perfil do usuário antes de criar a sessão, permitindo acesso às funcionalidades somente para usuários autorizados como promotores. | Protect | Equipe de desenvolvimento | Testes com tokens válidos, porém destinados a outro sistema ou pertencentes a usuários sem o perfil de promotor, demonstrando que o acesso é negado. | BAIXO |
+| RI04 | Reduzir | Exigir autenticação de serviço no endpoint utilizado pelo Módulo I.A. para atualização do status da transcrição e validar a origem, o identificador da transcrição e o caminho do arquivo antes de atualizar o registro. | Protect | Equipe de desenvolvimento | Testes de autenticação do endpoint e testes demonstrando que requisições não autenticadas ou com caminhos arbitrários são rejeitadas. | BAIXO |
 
 ---
 
