@@ -37,7 +37,7 @@ Descrição resumida das  estratégias que podem ser adotadas para tratamento de
 
 ### Plano de tratamento dos riscos
 
-A tabela abaixo contém o plano concreto para tratamento de cada risco e todas as informações necessárias.
+A tabela abaixo contém o plano concreto para tratamento dos riscos. A coluna especifica o mecânismo que será implementado para mitigar o(s) risco(s).
 
 | Risco | Estratégia | Controle | Função NIST CSF 2.0 | Responsáveis | Evidência necessária | Risco residual |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -45,6 +45,8 @@ A tabela abaixo contém o plano concreto para tratamento de cada risco e todas a
 | RI02 | Reduzir | O Backend deve utilizar exclusivamente a identidade do promotor obtida da sessão autenticada ao realizar consultas ao Sistema Processos, impedindo que a identidade seja definida por parâmetros enviados pelo cliente. | Protect | Equipe de desenvolvimento | Testes de autorização demonstrando que a alteração da identidade na requisição não permite acesso a processos de outro promotor; registros das requisições realizadas pelo Backend. | BAIXO |
 | RI03 | Reduzir | Validar, além da assinatura e do emissor do token, a audiência (audience) e o papel/perfil do usuário antes de criar a sessão, permitindo acesso às funcionalidades somente para usuários autorizados como promotores. | Protect | Equipe de desenvolvimento | Testes com tokens válidos, porém destinados a outro sistema ou pertencentes a usuários sem o perfil de promotor, demonstrando que o acesso é negado. | BAIXO |
 | RI04 | Reduzir | Exigir autenticação de serviço no endpoint utilizado pelo Módulo I.A. para atualização do status da transcrição e validar a origem, o identificador da transcrição e o caminho do arquivo antes de atualizar o registro. | Protect | Equipe de desenvolvimento | Testes de autenticação do endpoint e testes demonstrando que requisições não autenticadas ou com caminhos arbitrários são rejeitadas. | BAIXO |
+| RI08, RI09| Reduzir | Uma transcrição não pode ser alterada depois de finalizada. O promotor pode alterar apenas uma cópia do arquivo que ele baixou. Mas se ele subir um arquivo diferente pra contexto da I.A, uma verificação de hash deve ser feita para garantir que ele é identico ao que foi gerado. | Protect, Detect, Respond | Equipe de desenvolvimento | Evento em log da verificação do hash e teste para forçar transcrição adulterada. | BAIXO |
+| RI05, RI06 | Reduzir | Limita a quantidade de downloads da transcrição por usuário. Gerar um alerta caso a quantidade passar de um limite considerado "normal". Por exemplo, por que um usuário faria download de 5 cópias da mesma transcrição? | Identify, Protect, Detect, Respond | Equipe de desenvolvimento | Incluir contador de downloads como um campo no banco de dados | BAIXO |
 
 ---
 
