@@ -38,7 +38,6 @@ Cada risco corresponde à ameaça de mesmo número na [modelagem de ameaças](et
 | RI07 | AME7 | Promotor leva transcrição baixada a serviço externo e expõe dados sigilosos | 4 | 4 | 16 | MUITO ALTO |
 | RI02 | AME2 | Promotor obtém do Sistema Processos mídias de processos em que não atua | 3 | 4 | 12 | ALTO |
 | RI04 | AME4 | Chamada forjada ao endpoint de status entrega ao promotor transcrição errada | 3 | 4 | 12 | ALTO |
-| RI06 | AME6 | Mídia maliciosa juntada ao processo executa código no Módulo I.A. | 3 | 4 | 12 | ALTO |
 | RI13 | AME13 | Atacante com senha roubada age como promotor em todos os processos dele | 3 | 4 | 12 | ALTO |
 | RI03 | AME3 | Estagiário ou servidor do MP entra no sistema como promotor | 3 | 3 | 9 | ALTO |
 | RI08 | AME8 | Terceiro usa a sessão aberta do promotor em computador fora do MP | 3 | 3 | 9 | ALTO |
@@ -48,6 +47,7 @@ Cada risco corresponde à ameaça de mesmo número na [modelagem de ameaças](et
 | RI09 | AME9 | Promotor lota a fila com pedidos e atrasa transcrições dos colegas | 3 | 2 | 6 | MÉDIO |
 | RI11 | AME11 | Promotor acumula mídias grandes até o Storage recusar novas gravações | 2 | 3 | 6 | MÉDIO |
 | RI12 | AME12 | Promotor sobrecarrega o chat e esgota a I.A. ou o Backend | 2 | 3 | 6 | MÉDIO |
+| RI06 | AME6 | Mídia maliciosa juntada ao processo executa código no Módulo I.A. | 1 | 4 | 4 | BAIXO |
 | RI10 | AME10 | Promotor força falhas na I.A. e os retries esgotam a cota | 2 | 2 | 4 | BAIXO |
 | RI14 | AME14 | Atacante altera transcrição finalizada e o promotor usa o texto falso | 1 | 4 | 4 | BAIXO |
 
@@ -72,10 +72,6 @@ Na AME2, se o Backend omite a identidade, o promotor só informa o número do pr
 ##### RI04 - Atualização de status sem autenticação de serviço
 
 O Backend aceita login de qualquer máquina (AME8), e a AME4 supõe o endpoint de status aberto a quem o alcance. Achar esse endpoint, que a interface não usa, e o formato da chamada é o trabalho que mantém a probabilidade em 3. A RQNF6.3 não o detém, porque o hash do texto chega pelo próprio Módulo I.A., que ele imita. O impacto é 4 porque o promotor lê o depoimento de outro processo e pode usá-lo como prova.
-
-##### RI06 - Mídia maliciosa executa código no Módulo I.A.
-
-O atacante é parte no processo, dispensa conta e junta a mídia preparada, como no CAE6; a AME6 afirma que a RQNF6.5 não a barra. Montar o arquivo sem conhecer a versão do decodificador exige conhecimento que se contrata, e uma parte interessada no processo tem motivação alta; com a falha presente, a probabilidade é 3. O impacto é 4 porque o código roda com a credencial do Módulo I.A., que alcança todo o Storage e a fila.
 
 ##### RI13 - Falsificação de identidade de um promotor
 
@@ -113,6 +109,10 @@ Um promotor sozinho acrescenta uma fração da carga que a RQNF4.3 já prevê, d
 
 Basta um promotor com uma transcrição finalizada para abrir vários chats e disparar perguntas, e nenhum requisito limita isso. Diferente da fila, que enche até com uso legítimo, aqui o volume exige intenção, e o abuso não traz ganho a quem o pratica; a probabilidade fica em 2. O impacto é 3 porque, além da cota da I.A., que se recompõe sozinha, o esgotamento da memória do Backend que guarda o histórico derruba o sistema para todos, ferindo a disponibilidade mínima da RQNF5.6.
 
+##### RI06 - Mídia maliciosa executa código no Módulo I.A.
+
+O atacante não tem conta no serviço e precisa que a mídia preparada entre no processo. A inclusão de mídias no Sistema Processos cabe à polícia, aos cartórios e aos servidores do MP (escopo em servico.md); mesmo no CAE6, em que a mídia vem do advogado de um investigado, a juntada passa por esses atores. Montar o arquivo exige conhecer a versão do decodificador, e a AME6 afirma que a RQNF6.5 não o barra. Como o caminho depende de um ator institucional e de preparo raro, a probabilidade é 1. O impacto é 4 porque o código roda com a credencial do Módulo I.A., que alcança todo o Storage e a fila.
+
 ##### RI10 - Usuário força retries na I.A.
 
 Pela descrição do serviço (seções 2 e 4), o promotor escolhe mídias que outros atores juntaram ao processo e não envia arquivos próprios. Para forçar retries, precisa de mídias que passem pela RQNF6.5, que confere formato e malware, e ainda assim falhem na I.A.; depender delas mantém a probabilidade em 2. O impacto é 2 porque a cota da I.A. externa se recompõe sozinha: transcrição e chat falham para todos durante esse intervalo, e as transcrições perdidas podem ser pedidas de novo.
@@ -126,8 +126,8 @@ A AME14 supõe ausente a conferência de hash da RQNF6.3, mas não a regra da RQ
 #### Priorização
 
 1. RI01, RI07 (16): os dois MUITO ALTO. Um dá acesso ao acervo alheio trocando um id; o outro vaza dados sigilosos por uma função de uso rotineiro, sem nenhuma barreira técnica.
-2. RI02, RI04, RI06, RI13 (12): acesso indevido, desvio de conteúdo e execução de código com dano máximo e caminho de exploração plausível.
+2. RI02, RI04, RI13 (12): acesso indevido e desvio de conteúdo com dano máximo e caminho de exploração plausível.
 3. RI03, RI08 (9): intrusos com alcance limitado ao que a identidade ou a sessão aberta libera.
 4. RI05, RI15, RI16 (8): adulterações e desvios que exigem credencial da fila ou escrita no Storage, ao alcance de poucos.
 5. RI09, RI11, RI12 (6): indisponibilidades de fila, Storage e chat, com recuperação possível.
-6. RI10, RI14 (4): exploração custosa ou efeito que se recompõe sozinho.
+6. RI06, RI10, RI14 (4): exploração custosa ou dependente de ator institucional, ou efeito que se recompõe sozinho.
