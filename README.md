@@ -32,3 +32,5 @@ npm run mockups
 
 * O documento [etapa1-modelagem-ameacas.md](docs/etapa1-modelagem-ameacas.md) possui a modelagem das ameaças utilizando o framework STRIDE.
 * O documento [etapa2-analise-de-risco.md](docs/etapa2-analise-de-risco.md) possui o levantamento e classificação dos riscos.
+* O documento [etapa2-tratamento-de-risco-nist.md](docs/etapa2-tratamento-de-risco-nist.md) possui o plano de tratamento dos riscos com o NIST CSF 2.0, o risco residual e a ordem de implementação.
+* O documento [etapa3-arquitetura-segura.md](docs/etapa3-arquitetura-segura.md) possui os requisitos de segurança, as vulnerabilidades catalogadas, o diagrama da arquitetura segura e as decisões de arquitetura.
