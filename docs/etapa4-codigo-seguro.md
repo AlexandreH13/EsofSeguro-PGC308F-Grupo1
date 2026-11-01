@@ -67,7 +67,15 @@ O problema típico está em carregar o registro pelo id e só depois, em cada ro
 
 #### 3.2 Testes definidos antes da implementação
 
-Pendente.
+Cenário comum: promotor A tem sessão válida; o registro contém uma transcrição de A e uma de B, ambas finalizadas.
+
+| Teste | Entrada ou ação | Resultado esperado |
+| --- | --- | --- |
+| TS04 (malicioso) | A chama `GET` e `DELETE` em `/api/transcricoes/{id}` com o id da transcrição de B. A também chama `GET` com um id inexistente | As três chamadas respondem 403 com o corpo `{"erro":"acesso negado"}`, idêntico para id alheio e id inexistente. O corpo não traz mídia, processo nem texto de B. O registro de B continua existindo. Cada tentativa gera um alerta `ACESSO_NEGADO` com o promotor da sessão e o id, sem nenhum conteúdo da transcrição |
+| TS05 (válido) | A chama `GET` e `DELETE` com o id da própria transcrição | `GET` responde 200 com o texto. `DELETE` responde 204 e o registro deixa de existir. Nenhum alerta é gerado |
+| TS06 (ids) | Duas transcrições são criadas em sequência | Os dois ids são UUID versão 4 e diferentes entre si |
+
+Os testes estão em [AutorizacaoTranscricaoTest.java](../prototipo/src/test/java/br/grupo1/transcricao/pratica2/AutorizacaoTranscricaoTest.java), um método por linha da tabela e por operação. A classe entrou no repositório antes do controller e chama as rotas por URL, por isso compila e falha enquanto a implementação não existe.
 
 #### 3.3 Implementação
 
