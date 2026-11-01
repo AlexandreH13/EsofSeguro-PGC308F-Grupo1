@@ -79,11 +79,56 @@ Os testes estão em [AutorizacaoTranscricaoTest.java](../prototipo/src/test/java
 
 #### 3.3 Implementação
 
-Pendente.
+A implementação tem quatro partes, todas em `prototipo/src/main/java/br/grupo1/transcricao`.
+
+O filtro `sessao/SessaoFilter.java` exige sessão válida em toda rota `/api`, exceto a criação da sessão, e entrega o promotor autenticado aos controllers como atributo da requisição. Nenhuma rota de dados executa sem um promotor identificado.
+
+O repositório `transcricao/TranscricaoRepository.java` expõe a consulta `findByIdAndPromotorId(id, promotorId)`. O Spring Data gera o SQL com os dois critérios na cláusula `WHERE`, então o registro de outro promotor nunca é carregado, e o resultado para id alheio é o mesmo de id inexistente: vazio.
+
+O controller `transcricao/TranscricaoController.java` usa essa consulta nas duas rotas que recebem id e trata o vazio de um único jeito:
+
+```java
+@GetMapping("/{id}")
+public ResponseEntity<?> abrir(@PathVariable("id") UUID id,
+                               @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
+    return repositorio.findByIdAndPromotorId(id, sessao.promotorId())
+            .<ResponseEntity<?>>map(t -> ResponseEntity.ok(Detalhe.de(t)))
+            .orElseGet(() -> acessoNegado(sessao, id, "abrir"));
+}
+
+private ResponseEntity<Erro> acessoNegado(Sessao sessao, UUID id, String operacao) {
+    // Só o id entra no alerta. O conteúdo da transcrição nunca vai para o log.
+    auditoria.alerta("ACESSO_NEGADO", sessao.promotorId(), "operação " + operacao + " na transcrição " + id);
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Erro("acesso negado"));
+}
+```
+
+A resposta é a mesma para id alheio e id inexistente, para a rota não revelar quais ids existem. O alerta vai para `auditoria/Auditoria.java`, que registra no log e guarda em memória para os testes conferirem; entram só identificadores, nunca o conteúdo. A exclusão segue o mesmo caminho e ainda recusa, com 409, transcrições na fila ou em processamento (RQF9).
+
+A entidade `transcricao/Transcricao.java` gera o próprio id com `UUID.randomUUID()`, que produz UUID versão 4 a partir de um gerador criptográfico. Não há sequência no banco, então um id não dá pista sobre os vizinhos.
 
 #### 3.4 Resultado esperado e obtido
 
-Pendente.
+O critério de verificação do RS01 pede que, com as sessões de dois promotores, cada rota chamada por um com o id do outro responda acesso negado, não devolva nenhum dado, não altere nem exclua nada e gere um alerta, e que os ids sejam UUID v4 sem relação entre si. TS04 a TS06 cobrem cada um desses pontos.
+
+Antes da implementação, com a classe de teste no repositório e sem o controller, cinco dos seis testes falham porque as rotas não existem. TS06 já passa porque a geração do id está na entidade, que entrou com o modelo:
+
+```
+Tests run: 6, Failures: 5, Errors: 0, Skipped: 0 <<< FAILURE! -- in br.grupo1.transcricao.pratica2.AutorizacaoTranscricaoTest
+AutorizacaoTranscricaoTest.ts04_abrirTranscricaoDeOutroPromotorEhNegadoSemDevolverDados:67 Status expected:<403> but was:<404>
+AutorizacaoTranscricaoTest.ts04_excluirTranscricaoDeOutroPromotorEhNegadoENaoAlteraNada:78 Status expected:<403> but was:<404>
+AutorizacaoTranscricaoTest.ts04_idInexistenteRecebeAMesmaRespostaDoIdAlheio:88 Status expected:<403> but was:<404>
+AutorizacaoTranscricaoTest.ts05_abrirPropriaTranscricaoDevolveOConteudo:96 Status expected:<200> but was:<404>
+AutorizacaoTranscricaoTest.ts05_excluirPropriaTranscricaoRemoveORegistro:105 Status expected:<204> but was:<404>
+```
+
+Depois da implementação, os seis passam:
+
+```
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0 -- in br.grupo1.transcricao.pratica2.AutorizacaoTranscricaoTest
+```
+
+Na interface, o roteiro do README do protótipo reproduz o TS04 com dois promotores em abas diferentes: a página mostra acesso negado sem nenhum dado e o log do contêiner registra `ALERTA ACESSO_NEGADO promotor=promotor-b operação abrir na transcrição <id>`.
 
 #### 3.5 Referências OWASP
 
