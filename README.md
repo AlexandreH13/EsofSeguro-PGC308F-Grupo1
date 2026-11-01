@@ -34,3 +34,4 @@ npm run mockups
 * O documento [etapa2-analise-de-risco.md](docs/etapa2-analise-de-risco.md) possui o levantamento e classificação dos riscos.
 * O documento [etapa2-tratamento-de-risco-nist.md](docs/etapa2-tratamento-de-risco-nist.md) possui o plano de tratamento dos riscos com o NIST CSF 2.0, o risco residual e a ordem de implementação.
 * O documento [etapa3-arquitetura-segura.md](docs/etapa3-arquitetura-segura.md) possui os requisitos de segurança, as vulnerabilidades catalogadas, o diagrama da arquitetura segura e as decisões de arquitetura.
+* O documento [etapa4-codigo-seguro.md](docs/etapa4-codigo-seguro.md) possui as duas práticas de código seguro, com os testes definidos antes da implementação, o código e as referências da OWASP. O código executável, com backend Java e interface estática, fica em [prototipo](prototipo), e o [README](prototipo/README.md) da pasta explica como executar.
