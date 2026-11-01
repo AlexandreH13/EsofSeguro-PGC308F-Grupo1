@@ -34,3 +34,13 @@ Sem Docker, com Java 21, o Maven Wrapper faz o mesmo: `./mvnw test` e `./mvnw sp
 | Interface | Chega depois das práticas: páginas estáticas derivadas dos mockups, servidas pelo próprio backend |
 
 A sessão é um token opaco de 256 bits guardado em memória no Backend e enviado no cabeçalho `Authorization: Bearer`. Toda rota `/api` sem sessão válida responde 401 com `{"erro":"sessão inválida"}`.
+
+## Rotas
+
+| Rota | Sessão | Descrição |
+| --- | --- | --- |
+| `GET /api/transcricoes` | sim | Transcrições do promotor da sessão (RQF5) |
+| `GET /api/transcricoes/{id}` | sim | Abre uma transcrição do promotor da sessão (RQF6, prática 2) |
+| `DELETE /api/transcricoes/{id}` | sim | Exclui uma transcrição do promotor da sessão (RQF9, prática 2) |
+
+A criação e o encerramento da sessão chegam com a prática 1. Até lá, os testes criam a sessão direto no `SessaoStore`.
