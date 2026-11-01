@@ -1,0 +1,19 @@
+services:
+  # A aplicação. A construção da imagem compila e roda os testes (ver Dockerfile).
+  transcricao:
+    build: .
+    ports:
+      - "${PORTA:-8080}:8080"
+
+  # Só os testes, com a saída completa: docker compose run --rm testes
+  testes:
+    image: maven:3.9-eclipse-temurin-21
+    profiles: ["testes"]
+    working_dir: /app
+    volumes:
+      - .:/app
+      - maven-cache:/root/.m2
+    command: mvn -B test
+
+volumes:
+  maven-cache:
