@@ -66,6 +66,9 @@ O diagrama abaixo segue a arquitetura proposta. A tabela abaixo descreve cada id
 | AUTZ | Regras de autorização do backend | A parte do Backend que decide se o promotor pode acessar uma transcrição ou um processo. Vem de authorization |
 | ST | Endpoint de status | O ponto do Backend que o Módulo I.A chama para atualizar o status da transcrição (RQF4) |
 
+\
+**Diagrama da arquitetura segura**
+
 ```mermaid
 flowchart LR
     %% ===== Parte 1: usuários, interface, autenticação e autorização =====
@@ -74,7 +77,41 @@ flowchart LR
     %% ===== Fim da parte 1 =====
 
     %% ===== Parte 2: banco de dados, logs, serviços externos e controles =====
+
     %% Identificadores: DB, S, LOG, SP, IA, RS01, RS02, RS03
+          subgraph DADOS["Dados e monitoramento"]
+          DB[("Registro de<br/>transcrições")]
+          S[("Storage<br/>mídias e transcrições")]
+          LOG["Logs e alertas"]
+      end
+
+      subgraph EXT["Serviços externos"]
+          IdP
+          SP["Sistema Processos<br/>(autoriza por processo)"]
+          IA["I.A externa"]
+      end
+
+      AUTZ -->|"consulta processos e mídias"| SP
+      AUTZ --> DB
+      AUTZ -->|"copia mídia"| S
+      ST --> DB
+      M -->|"lê mídia, grava transcrição"| S
+      M -->|"envia mídia"| IA
+
+      AUTN -.->|"recusas"| LOG
+      AUTZ -.->|"acessos negados, downloads"| LOG
+      ST -.->|"recusas"| LOG
+      M -.->|"falhas de hash"| LOG
+
+      RS02{{"RS02: só aceita token<br/>com segundo fator"}}
+      RS01{{"RS01: confere o dono da transcrição;<br/>ids UUID v4"}}
+      RS03{{"RS03: só aceita TLS mútuo com<br/>o certificado do Módulo I.A"}}
+      RS02 -.- AUTN
+      RS01 -.- AUTZ
+      RS03 -.- ST
+
+      classDef controle fill:#fde2e2,stroke:#c0392b,stroke-width:2px,color:#000
+      class RS01,RS02,RS03 controle
 
     %% ===== Fim da parte 2 =====
 ```
