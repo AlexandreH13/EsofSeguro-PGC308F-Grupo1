@@ -74,6 +74,16 @@ flowchart LR
     %% ===== Parte 1: usuários, interface, autenticação e autorização =====
     %% Identificadores: P, UI, F, M, IdP, AUTN, AUTZ, ST
 
+    P["Promotor"] -->|"usa"| UI["Interface web"]
+    UI -->|"inicia autenticação"| AUTN["AUTN<br/>Valida token e cria sessão"]
+    AUTN -->|"solicita autenticação"| IdP
+    IdP -->|"token de identidade com MFA"| AUTN
+    AUTN -->|"sessão local criada"| UI
+    AUTN -->|"identidade validada"| AUTZ["AUTZ<br/>Confere sessão e autorização"]
+    UI -->|"requisições com sessão"| AUTZ
+    AUTZ -->|"resposta permitida ou negada"| UI
+    UI -->|"exibe resultado"| P
+
     %% ===== Fim da parte 1 =====
 
     %% ===== Parte 2: banco de dados, logs, serviços externos e controles =====
