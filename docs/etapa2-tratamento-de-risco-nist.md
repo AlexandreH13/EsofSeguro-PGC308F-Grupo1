@@ -2,50 +2,85 @@
 
 ### Descrição
 
-Neste documento será implementado a estratégia para mitigação dos riscos já levantados [neste documento](etapa2-analise-de-risco.md). Para isso iresmos utilizar o framework NIST CSF 2.0. Este documento tem como objetivo responder para cada risco levantado **o que fazer** com o mesmo.
+Este documento define o tratamento dos riscos levantados na [análise de risco](etapa2-analise-de-risco.md), com base no framework NIST CSF 2.0. Para cada risco, ele responde o que fazer, quem faz e o que comprova que foi feito.
 
 ---
 
 ### As funções do NIST
 
-A tabela abaixo detalha as **funções** sugeridas pelo framework NIST CSF 2.0.
+A tabela abaixo resume as funções do NIST CSF 2.0 e as categorias citadas no plano.
 
-
-| Função | Descrição |
-| --- | --- |
-| Govern | Define as políticas, responsabilidades e pessoas que devem tratar cada risco. |
-| Identify | Identificar os ativos, dependências, vulnerabilidades e riscos. |
-| Protect | Implementar salvaguardas para mitigar a probabilidade ou o impacto, ou ambos. |
-| Detect | Identificar eventos suspeitos. Uso de logs e monitoramento. |
-| Respond | Após a identificação, como responder a um evento suspeito ou malicioso? Conter a ameaça, analisar e tratar. |
-| Recover | Quando um evento malicioso acontece, como reverter o prejuízo? |
+| Função   | Descrição |
+|----------|-----------|
+| Govern   | Define política, papéis e responsabilidades. Categoria usada: GV.PO (política). |
+| Identify | Identifica ativos, vulnerabilidades e riscos e escolhe a resposta a cada risco. Categoria usada: ID.RA (avaliação de risco), incluindo ID.RA-06, a escolha e o registro da resposta. |
+| Protect  | Implanta salvaguardas que reduzem a probabilidade, o impacto ou ambos. Categorias usadas: PR.AA (identidade, autenticação e controle de acesso), PR.DS (segurança dos dados), PR.PS (segurança da plataforma) e PR.IR (resiliência da infraestrutura). |
+| Detect   | Identifica eventos adversos. Categorias usadas: DE.CM (monitoramento contínuo) e DE.AE (análise de eventos adversos). |
+| Respond  | Contém, analisa e trata um incidente detectado. Categoria usada: RS.MI (mitigação). |
+| Recover  | Restaura dados e serviços afetados por um incidente, malicioso ou não. O plano não usa esta função, porque a restauração depende do backup diário da RQNF5.7, já exigido. |
 
 ---
 
 ### Estratégias de tratamento
 
-Descrição resumida das  estratégias que podem ser adotadas para tratamento de cada risco
+Estratégias que podem ser adotadas para cada risco:
 
-| Estratégia | Descrição |
-| --- | --- |
-| Evitar | Eliminar a funcionalidade ou condição que permite o risco. |
-| Reduzir | Implementar mecanismos que mitigam a probabilidade ou o impacto do risco. |
-| Compartilhar | Compartilhar com terceiros a responsabilidade e tratamento do risco. |
-| Aceitar | Aceitar a existência do risco. Decisão consciente. No entanto, mantém o risco monitorado. |
+| Estratégia   | Descrição |
+|--------------|-----------|
+| Evitar       | Eliminar a funcionalidade ou a condição que permite o risco. |
+| Reduzir      | Implantar mecanismos que diminuem a probabilidade ou o impacto do risco. |
+| Compartilhar | Dividir com terceiros a responsabilidade pelo tratamento do risco. |
+| Aceitar      | Manter o risco sem tratamento adicional, por decisão registrada do dono do risco, e continuar a monitorá-lo. |
 
 ---
 
 ### Plano de tratamento dos riscos
 
-A tabela abaixo contém o plano concreto para tratamento dos riscos. A coluna especifica o mecânismo que será implementado para mitigar o(s) risco(s).
+A tabela abaixo detalha o controle, o responsável e a evidência de cada risco. Os limites numéricos são valores iniciais. Os responsáveis seguem quatro papéis: desenvolvimento do Backend e do Módulo I.A., infraestrutura, operação do serviço, que recebe os alertas, e gestão do MP. Provedor de identidade e Sistema Processos ficam fora do serviço; quando um controle depende deles, a linha avisa.
 
 | Risco | Estratégia | Controle | Função NIST CSF 2.0 | Responsáveis | Evidência necessária | Risco residual |
-| --- | --- | --- | --- | --- | --- | --- |
-| RI01, RI02 | Reduzir | Implementar autorização por objeto no Backend, utilizando exclusivamente a identidade do promotor obtida da sessão autenticada. Antes de permitir visualização, download, exclusão ou uso de uma transcrição, o Backend deve validar se ela pertence ao promotor autenticado. Da mesma forma, ao consultar o Sistema Processos, a identidade do promotor não deve ser definida por parâmetros enviados pelo cliente. | Protect | Equipe de desenvolvimento | Testes demonstrando que um promotor não consegue acessar transcrições ou processos pertencentes a outro promotor, inclusive quando tenta alterar a identidade informada na requisição. Validação do código de autorização. | BAIXO |
-| RI03 | Reduzir | Validar, além da assinatura e do emissor do token, a audiência (`audience`) e o papel/perfil do usuário antes de criar a sessão, permitindo acesso às funcionalidades somente para usuários autorizados como promotores. | Protect | Equipe de desenvolvimento | Testes com tokens válidos, porém destinados a outro sistema ou pertencentes a usuários sem o perfil de promotor, demonstrando que o acesso é negado. | BAIXO |
-| RI04 | Reduzir | Exigir autenticação de serviço no endpoint utilizado pelo Módulo I.A. para atualização do status da transcrição e validar a origem, o identificador da transcrição e o caminho do arquivo antes de atualizar o registro. | Protect | Equipe de desenvolvimento | Testes de autenticação do endpoint e testes demonstrando que requisições não autenticadas ou com caminhos arbitrários são rejeitadas. | BAIXO |
-| RI08, RI09| Reduzir | Uma transcrição não pode ser alterada depois de finalizada. O promotor pode alterar apenas uma cópia do arquivo que ele baixou. Mas se ele subir um arquivo diferente pra contexto da I.A, uma verificação de hash deve ser feita para garantir que ele é identico ao que foi gerado. | Protect, Detect, Respond | Equipe de desenvolvimento | Evento em log da verificação do hash e teste para forçar transcrição adulterada. | BAIXO |
-| RI05, RI06 | Reduzir | Limita a quantidade de downloads da transcrição por usuário. Gerar um alerta caso a quantidade passar de um limite considerado "normal". Por exemplo, por que um usuário faria download de 5 cópias da mesma transcrição? | Identify, Protect, Detect, Respond | Equipe de desenvolvimento | Incluir contador de downloads como um campo no banco de dados | BAIXO |
+|-------|------------|----------|--------------------|--------------|----------------------|----------------|
+| RI01, RI02 | Reduzir | Fazer a conferência de propriedade, que os casos de uso RQF4 e RQF6 a RQF9 já preveem, numa verificação única do Backend para toda rota com id de transcrição ou de chat (RQF10), e gerar ids aleatórios (UUID v4). Montar a identidade repassada ao Sistema Processos (RQF2 e RQF3) só a partir da sessão, inclusive quando a requisição não traz nenhuma; essa parte depende da premissa 5 dos casos de uso. Acesso negado por propriedade e requisição com campo de identidade geram alerta. | Protect (PR.AA), Detect (DE.AE) | Desenvolvimento do Backend | Suíte automatizada, executada a cada entrega, com um teste por rota em que o promotor A usa um id de B, recebe acesso negado e dispara o alerta; testes em que a requisição com identidade de outro promotor é recusada com alerta e em que toda chamada ao Sistema Processos leva a identidade da sessão. | BAIXO (4) para ambos |
+| RI03 | Reduzir | Aceitar só o token que o Backend obtém na troca do código (RQF1), com audiência (`audience`) deste serviço, e exigir nele o papel de promotor, como pede a RQF1.2. Premissa: o provedor de identidade emite esse papel. | Protect (PR.AA) | Desenvolvimento do Backend; equipe do provedor de identidade | Configuração do provedor que atribui o papel de promotor; testes em que token de outro sistema do MP e token sem o papel são recusados. | BAIXO (3) |
+| RI04 | Reduzir | Exigir no endpoint de status TLS mútuo com certificado exclusivo do Módulo I.A., recusando com alerta as demais chamadas. O endpoint deixa de receber caminho, que Backend e Módulo I.A. derivam do id, e recusa mudança após finalizada, salvo o mesmo status repetido na reentrega da RQNF5.1. | Protect (PR.AA), Detect (DE.AE) | Desenvolvimento do Backend e do Módulo I.A.; infraestrutura | Testes em que chamadas sem certificado, com certificado de outro serviço ou que mudam transcrição finalizada são recusadas com alerta. | BAIXO (4) |
+| RI05, RI16 | Reduzir | Separar as credenciais da fila (o Backend só publica, o Módulo I.A. só consome). O Backend assina cada mensagem com chave mantida em cofre de chaves da nuvem, premissa não descrita no servico.md, e o Módulo I.A. recusa com alerta mensagem sem assinatura válida. | Protect (PR.AA, PR.DS), Detect (DE.AE) | Desenvolvimento do Backend e do Módulo I.A.; infraestrutura | Testes em que mensagem sem assinatura, com outra chave ou com campo alterado é recusada sem acesso ao Storage; testes das permissões das duas credenciais. | BAIXO (4) para ambos |
+| RI06 | Reduzir | Premissa da AME6, ausente do servico.md e do RQF4: o Módulo I.A. decodifica a mídia. Fazer isso em contêiner descartável por mídia, sem rede, credencial nem privilégio, com limite de tempo e memória e alerta em falha, e atualizar o decodificador até 7 dias após vulnerabilidade publicada. | Identify (ID.RA), Protect (PR.PS, PR.IR), Detect (DE.AE) | Desenvolvimento do Módulo I.A.; infraestrutura; operação do serviço | Testes no contêiner em que a rede falha, não há credencial e o estouro de limite termina em falha com alerta; histórico de versões do decodificador diante das vulnerabilidades publicadas. | BAIXO (2) |
+| RI07 | Aceitar | Nenhum controle do serviço impede colar em outra I.A. o texto baixado (RQF8) ou exibido (RQF6). A gestão do MP publica regra que proíbe levar transcrições a serviços externos, e o Backend registra cada download para apoiar a apuração de um vazamento. | Govern (GV.PO), Identify (ID.RA), Detect (DE.CM) | Gestão do MP; desenvolvimento do Backend | Decisão de aceite registrada pela gestão do MP; regra publicada; evento de download na trilha de auditoria, em teste. | MUITO ALTO (16) |
+| RI08 | Reduzir | Expirar a sessão após 15 minutos sem tecla, clique ou rolagem e após 8 horas. Com apoio do provedor de identidade, o RQF11 também encerra a sessão no provedor, e download e exclusão pedem nova autenticação após 15 minutos. A operação acompanha quantas sessões terminam por expiração. | Protect (PR.AA), Detect (DE.CM) | Desenvolvimento do Backend; equipe do provedor de identidade; operação do serviço | Testes de expiração (15 minutos sem interação e 8 horas), de novo acesso após o RQF11 pedindo credenciais e de download e exclusão pedindo autenticação. | MÉDIO (6) |
+| RI09 | Reduzir | Limitar cada promotor a 10 solicitações simultâneas na fila ou em processamento, até 3 na fila de mídias grandes (RQNF4.4), recusando o excesso antes da cópia. Espera acima de 30 minutos gera alerta, e a operação amplia as instâncias do Módulo I.A. | Protect (PR.IR), Detect (DE.CM) | Desenvolvimento do Backend; operação do serviço | Teste em que o 11º pedido simultâneo do mesmo promotor é recusado sem cópia no Storage; alerta com espera simulada acima de 30 minutos. | BAIXO (4) |
+| RI10 | Aceitar | Nenhum controle novo: a cota da I.A. se recompõe sozinha, e as transcrições perdidas podem ser pedidas de novo. A operação acompanha as falhas da I.A. por promotor a partir do motivo que a RQNF5.3 grava. | Identify (ID.RA), Detect (DE.CM) | Gestão do MP; operação do serviço | Decisão de aceite registrada; relatório das falhas da I.A. por promotor, gerado do registro de transcrições. | BAIXO (4) |
+| RI11 | Reduzir | Apagar a cópia da mídia do Storage quando a transcrição é finalizada; a reentrega da RQNF5.1 não a procura, pela idempotência da RQNF5.2. Mídia de transcrição com falha fica 7 dias para a operação analisar os alertas do RI06 e do RI15. Ocupação acima de 80% gera alerta. | Protect (PR.IR), Detect (DE.CM) | Desenvolvimento do Backend; infraestrutura; operação do serviço | Testes em que a mídia some ao finalizar sem quebrar a reentrega, e a de falha some após 7 dias; alerta com ocupação simulada acima de 80%. | BAIXO (3) |
+| RI12 | Reduzir | Limitar cada promotor a 2 chats abertos e 3 perguntas por minuto, novas tentativas incluídas, e guardar em memória só as 20 últimas trocas de cada chat, que são as enviadas à I.A. | Protect (PR.IR) | Desenvolvimento do Backend | Testes em que o 3º chat e a 4ª pergunta no mesmo minuto são recusados; teste de carga com todos os promotores em 2 chats sobre a maior transcrição, sem esgotar a memória. | BAIXO (2) |
+| RI13 | Reduzir | O provedor de identidade exige segundo fator dos promotores, e o Backend aceita só token que o indique (acr ou amr). O Backend alerta quando um promotor entra de país ou provedor de acesso nunca usado por ele; a operação confirma com o promotor e revoga as sessões dele. | Protect (PR.AA), Detect (DE.AE), Respond (RS.MI) | Equipe do provedor de identidade; desenvolvimento do Backend; operação do serviço | Configuração do provedor com segundo fator obrigatório; testes em que token sem segundo fator é recusado, login de origem nova gera alerta e a revogação encerra as sessões do promotor. | MÉDIO (8) |
+| RI14 | Aceitar | Nenhum controle novo. A P = 1 da análise já supõe a RQNF6.2 aplicada como bloqueio de sobrescrita no Storage, e os eventos de auditoria da RQNF6.3 servem de monitoramento. | Identify (ID.RA), Detect (DE.CM) | Gestão do MP; infraestrutura | Decisão de aceite registrada; teste em que o Storage recusa a sobrescrita de transcrição finalizada pelas credenciais do Backend e do Módulo I.A. | BAIXO (4) |
+| RI15 | Reduzir | Levar o hash da RQNF6.1 na mensagem assinada do RI05 e RI16 e permitir gravar mídias só à credencial do Backend. A divergência, que o RQF4 já trata como falha, também gera alerta. | Protect (PR.DS, PR.AA), Detect (DE.AE) | Desenvolvimento do Backend e do Módulo I.A.; infraestrutura | Teste em que a mídia trocada após a cópia termina em falha com alerta; teste em que a credencial do Módulo I.A. não grava no local das mídias. | BAIXO (4) |
+
+---
+
+### Risco residual e condições de aceite
+
+O residual usa a escala da análise: nota igual a P × I e a mesma tabela de referência. Controle que impede o evento reduz P; controle que limita o dano do evento reduz I. Residual BAIXO é aceito com as evidências da linha no plano. Residual MÉDIO ou acima, e toda linha em Aceitar, exige também decisão registrada da gestão do MP, dona dos riscos (ID.RA-06), e o monitoramento indicado como Detect no plano.
+
+| Risco | Nível inicial | Nível residual esperado | Condição para aceitar o residual |
+| --- | --- | --- | --- |
+| RI01 | MUITO ALTO (P 4 × I 4 = 16) | BAIXO (P 1 × I 4 = 4) | Na data do aceite, a suíte cobre todas as rotas que recebem id e está ligada à esteira de entrega. |
+| RI02 | ALTO (P 3 × I 4 = 12) | BAIXO (P 1 × I 4 = 4) | O responsável pelo Sistema Processos confirma por escrito a premissa 5. |
+| RI03 | ALTO (P 3 × I 3 = 9) | BAIXO (P 1 × I 3 = 3) | A configuração apresentada atribui o papel de promotor só a promotores. |
+| RI04 | ALTO (P 3 × I 4 = 12) | BAIXO (P 1 × I 4 = 4) | O isolamento do RI06 está comprovado, para que o certificado do Módulo I.A. fique fora do alcance de código injetado. |
+| RI05 | MÉDIO (P 2 × I 4 = 8) | BAIXO (P 1 × I 4 = 4) | A chave de assinatura só existe no cofre, sem cópia no Backend. |
+| RI06 | BAIXO (P 1 × I 4 = 4) | BAIXO (P 1 × I 2 = 2) | A premissa da decodificação no Módulo I.A. está confirmada; se só a I.A. externa decodifica, a linha deve ser refeita. |
+| RI07 | MUITO ALTO (P 4 × I 4 = 16) | MUITO ALTO (P 4 × I 4 = 16) | Decisão da gestão do MP, reavaliada a cada 12 meses. A única forma de reduzir P é retirar download e exibição, o que elimina a finalidade do serviço. |
+| RI08 | ALTO (P 3 × I 3 = 9) | MÉDIO (P 2 × I 3 = 6) | O provedor de identidade atende ao encerramento e à reautenticação pedidos pelo Backend. |
+| RI09 | MÉDIO (P 3 × I 2 = 6) | BAIXO (P 2 × I 2 = 4) | A operação consegue ampliar o Módulo I.A. dentro da cota contratada da I.A. |
+| RI10 | BAIXO (P 2 × I 2 = 4) | BAIXO (P 2 × I 2 = 4) | Decisão da gestão do MP; falhas repetidas de um mesmo promotor levam à reavaliação do risco. |
+| RI11 | MÉDIO (P 2 × I 3 = 6) | BAIXO (P 1 × I 3 = 3) | A remoção não alcança mídia de transcrição na fila ou em processamento. |
+| RI12 | MÉDIO (P 2 × I 3 = 6) | BAIXO (P 1 × I 2 = 2) | O teste de carga usa o número real de promotores do MP. |
+| RI13 | ALTO (P 3 × I 4 = 12) | MÉDIO (P 2 × I 4 = 8) | O provedor de identidade emite acr ou amr no token. |
+| RI14 | BAIXO (P 1 × I 4 = 4) | BAIXO (P 1 × I 4 = 4) | Decisão da gestão do MP, com o bloqueio de sobrescrita comprovado. |
+| RI15 | MÉDIO (P 2 × I 4 = 8) | BAIXO (P 1 × I 4 = 4) | A assinatura do RI05 e RI16 funciona. A adulteração no Sistema Processos, antes da cópia, cabe ao responsável por aquele sistema. |
+| RI16 | MÉDIO (P 2 × I 4 = 8) | BAIXO (P 1 × I 4 = 4) | Mesma condição do RI05; a reentrega de mensagem legítima não gera nova transcrição (RQNF5.2). |
+
+Se uma evidência não for produzida, um teste falhar ou uma dependência externa não se confirmar, o residual daquela linha volta ao nível inicial e o risco deve ser reavaliado.
 
 ---
 
@@ -57,10 +92,13 @@ A implementação das estratégias deve priorizar inicialmente os controles rela
 
 | Ordem | Riscos | Estratégia | Implementação resumida |
 | --- | --- | --- | --- |
-| 1 | RI01, RI02 e RI03 | Reduzir | Implementar os controles de autenticação e autorização no Backend, garantindo que o usuário autenticado tenha acesso somente às transcrições e processos que lhe pertencem e que sua identidade não possa ser alterada por parâmetros enviados pelo cliente. |
-| 2 | RI04 | Reduzir | Proteger o endpoint utilizado pelo Módulo I.A. para atualização das transcrições, exigindo autenticação de serviço e validando os identificadores e caminhos recebidos. |
-| 3 | RI08, RI09 | Reduzir | Implementar o controle de integridade das transcrições por meio de hash, impedindo alterações em transcrições finalizadas e verificando arquivos enviados novamente para utilização no contexto da I.A. |
-| 4 | RI05, RI06 | Reduzir | Implementar o controle de downloads, registrando a quantidade de downloads realizados por usuário e criando mecanismos de alerta para comportamentos que ultrapassem o padrão esperado. |
+| 1 | RI01, RI02, RI03 e RI13 | Reduzir | Implementar os controles de autenticação e autorização no Backend, garantindo que o usuário autenticado tenha acesso somente às transcrições e processos que lhe pertencem e que sua identidade não possa ser alterada por parâmetros enviados pelo cliente. |
+| 2 | RI04 e RI06 | Reduzir | Proteger o endpoint utilizado pelo Módulo I.A. para atualização das transcrições, exigindo autenticação de serviço e validando os identificadores recebidos, e isolar a decodificação da mídia no Módulo I.A. |
+| 3 | RI05, RI16 e RI15 | Reduzir | Implementar o controle de integridade das mídias por meio de hash e da assinatura das mensagens da fila. |
+| 4 | RI07 | Aceitar | Implementar o controle de downloads, registrando a quantidade de downloads realizados por usuário. |
+| 5 | RI08, RI09, RI11 e RI12 | Reduzir | Implementar os limites de uso (sessão, solicitações simultâneas, chats e perguntas) e a remoção das mídias já transcritas, com alerta quando o padrão esperado é ultrapassado. |
+
+RI10 e RI14 ficam em Aceitar sem controle novo e não entram na ordem.
 
 ---
 
