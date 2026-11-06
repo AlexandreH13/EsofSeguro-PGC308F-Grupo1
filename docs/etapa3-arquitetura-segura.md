@@ -53,7 +53,68 @@ Referências:
 
 ### 3. Diagrama da arquitetura segura
 
-Pendente.
+O diagrama abaixo segue a arquitetura proposta. A tabela abaixo descreve cada identificador:
+
+| Identificador | Componente | O que representa |
+| --- | --- | --- |
+| P | Promotor | O usuário do sistema |
+| UI | Interface web | As telas que o promotor usa (mockups T1 a T6) |
+| F | Fila | O enfileiramento que recebe os pedidos de transcrição |
+| M | Módulo I.A | O worker Python que consome a fila e cuida da transcrição |
+| IdP | Provedor de identidade | O SSO do MP, que confere a senha e emite o token de identidade. A sigla vem de Identity Provider |
+| AUTN | Autenticação do backend | A parte do Backend que valida o token e cria a sessão (RQF1). Vem de authentication |
+| AUTZ | Regras de autorização do backend | A parte do Backend que decide se o promotor pode acessar uma transcrição ou um processo. Vem de authorization |
+| ST | Endpoint de status | O ponto do Backend que o Módulo I.A chama para atualizar o status da transcrição (RQF4) |
+
+\
+**Diagrama da arquitetura segura**
+
+```mermaid
+flowchart LR
+    %% ===== Parte 1: usuários, interface, autenticação e autorização =====
+    %% Identificadores: P, UI, F, M, IdP, AUTN, AUTZ, ST
+
+    %% ===== Fim da parte 1 =====
+
+    %% ===== Parte 2: banco de dados, logs, serviços externos e controles =====
+
+    %% Identificadores: DB, S, LOG, SP, IA, RS01, RS02, RS03
+          subgraph DADOS["Dados e monitoramento"]
+          DB[("Registro de<br/>transcrições")]
+          S[("Storage<br/>mídias e transcrições")]
+          LOG["Logs e alertas"]
+      end
+
+      subgraph EXT["Serviços externos"]
+          IdP
+          SP["Sistema Processos<br/>(autoriza por processo)"]
+          IA["I.A externa"]
+      end
+
+      AUTZ -->|"consulta processos e mídias"| SP
+      AUTZ --> DB
+      AUTZ -->|"copia mídia"| S
+      ST --> DB
+      M -->|"lê mídia, grava transcrição"| S
+      M -->|"envia mídia"| IA
+
+      AUTN -.->|"recusas"| LOG
+      AUTZ -.->|"acessos negados, downloads"| LOG
+      ST -.->|"recusas"| LOG
+      M -.->|"falhas de hash"| LOG
+
+      RS02{{"RS02: só aceita token<br/>com segundo fator"}}
+      RS01{{"RS01: confere o dono da transcrição;<br/>ids UUID v4"}}
+      RS03{{"RS03: só aceita TLS mútuo com<br/>o certificado do Módulo I.A"}}
+      RS02 -.- AUTN
+      RS01 -.- AUTZ
+      RS03 -.- ST
+
+      classDef controle fill:#fde2e2,stroke:#c0392b,stroke-width:2px,color:#000
+      class RS01,RS02,RS03 controle
+
+    %% ===== Fim da parte 2 =====
+```
 
 ---
 
