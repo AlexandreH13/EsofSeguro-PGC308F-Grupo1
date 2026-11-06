@@ -59,6 +59,10 @@ Pendente.
 
 ### 4. Decisões de arquitetura
 
+As decisões arquiteturais abaixo definem como os requisitos de segurança serão implementados nos componentes do serviço de transcrição. Cada decisão está associada a um risco identificado e possui um critério de aceitação verificável.
+
 | ID | Decisão | Rastreabilidade | Critério de aceitação |
-| --- | --- | --- | --- |
-| DA01 | Qual a decisão arquitetural para cumprir o requisito de segurança associado? (Devemos responder essa pergunta aqui) | RS01, V01, AME1 | Qual teste deve ser feito |
+|---|---|---|---|
+| DA01 | Implementar autorização no Backend, utilizando a identidade do promotor autenticado para validar a propriedade de cada transcrição ou chat antes de permitir consultas, downloads, exclusões ou qualquer outra operação. Os identificadores dos recursos serão gerados como UUID v4. | RS01, V01, RI01 (AME1) | Realizar testes com dois promotores diferentes. O sistema deverá impedir que um promotor acesse, altere, baixe ou exclua recursos pertencentes ao outro. |
+| DA02 | Integrar o Backend ao provedor de identidade institucional, exigindo autenticação multifator (MFA). O Backend deverá validar os dados do token de identidade e confirmar a presença da indicação de segundo fator antes de criar uma sessão. | RS02, V02, RI13 (AME13) | Enviar um token válido sem indicação de MFA e verificar que o Backend recusa a criação da sessão. Em seguida, enviar um token válido com MFA e verificar que a sessão é criada. |
+| DA03 | Implementar autenticação entre serviços utilizando TLS mútuo (mTLS), com certificado digital exclusivo para o Módulo I.A. O Backend deverá validar o certificado antes de aceitar atualizações de status e controlar os campos que podem ser alterados. | RS03, V03, RI04 (AME4) | Realizar chamadas sem certificado, com certificado inválido e com certificado de outro serviço. Todas deverão ser recusadas. Uma chamada com certificado válido e campos permitidos deverá atualizar o status corretamente. |
