@@ -60,3 +60,14 @@ A sessão é um token opaco de 256 bits guardado em memória no Backend e enviad
 - O DOCX é gerado localmente a partir do texto armazenado no H2; não há Storage separado nem verificação de hash de arquivo.
 - O chat e seu contexto ficam em memória e são descartados ao encerrar o chat ou a sessão. A resposta é simulada, sem conexão com IA externa.
 - A expiração automática por inatividade não está implementada; o prazo precisa ser definido.
+
+## Verificação de vulnerabilidades
+
+A sessão de verificação da Etapa 5 roda o ZAP contra a aplicação, tudo dentro do compose, que sobe a aplicação junto (vale a mesma regra da porta). O roteiro exclui transcrições, então a aplicação precisa estar com os dados iniciais:
+
+```
+docker compose up -d --force-recreate transcricao
+docker compose run --rm zap
+```
+
+O script `zap/sessao.py` sobe o ZAP em modo daemon, repete pelo proxy o fluxo da demonstração (login, lista, abrir, excluir) e os abusos das etapas 1 e 2, roda o spider, o scan passivo e o scan ativo com a sessão de um promotor, e grava os relatórios em [evidencias/etapa-5](../evidencias/etapa-5): `zap-relatorio.html`, `zap-relatorio.json`, `alertas.md`, `trafego.log` e `sessao.txt`. A análise dos achados está em [docs/etapa5-verificacao-vulnerabilidades.md](../docs/etapa5-verificacao-vulnerabilidades.md).

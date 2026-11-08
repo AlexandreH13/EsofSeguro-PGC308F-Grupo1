@@ -15,5 +15,16 @@ services:
       - maven-cache:/root/.m2
     command: mvn -B test
 
+  # Verificação de vulnerabilidades da Etapa 5 com o ZAP: docker compose run --rm zap
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    profiles: ["verificacao"]
+    depends_on:
+      - transcricao
+    volumes:
+      - ./zap:/zap/wrk:ro
+      - ../evidencias/etapa-5:/zap/relatorios
+    command: python3 /zap/wrk/sessao.py
+
 volumes:
   maven-cache:
