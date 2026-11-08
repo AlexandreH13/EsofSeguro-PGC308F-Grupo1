@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Entrada</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="screen">
+  <div class="header">
+    <div class="brand">Transcrição de Mídias <small>Ministério Público do Estado</small></div>
+  </div>
+  <div class="content">
+    <div class="card center">
+      <p class="muted">Acesso restrito a membros da promotoria, com a conta institucional.</p>
+      <div style="text-align:left;margin-top:16px">
+        <label for="promotor">Conta institucional (simulada)</label>
+        <select id="promotor" class="input block"></select>
+      </div>
+      <p style="margin-top:20px"><button class="btn block" id="entrar">Entrar com conta institucional</button></p>
+      <p style="margin-top:8px"><button class="btn block secondary" id="entrar-sem-mfa">Simular login sem segundo fator</button></p>
+      <div id="erro" class="callout warn" hidden></div>
+      <p class="muted small" style="margin-top:16px">Você será redirecionado ao provedor de identidade do Ministério Público e voltará para cá após a autenticação.</p>
+    </div>
+    <div style="width:400px;margin:24px auto 0">
+      <div class="callout">Protótipo: o provedor de identidade é simulado em <span class="mono">/idp-fake</span> e emite o token de identidade com ou sem o segundo fator no claim <span class="mono">amr</span>. O Backend só cria a sessão quando o token comprova o segundo fator (RS02).</div>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+<script>
+  const seletor = document.getElementById('promotor');
+  const erro = document.getElementById('erro');
+
+  fetch('/idp-fake/promotores').then(r => r.json()).then(promotores => {
+    for (const p of promotores) {
+      const opcao = el('option', null, p.nome);
+      opcao.value = p.id;
+      seletor.appendChild(opcao);
+    }
+  });
+
+  async function entrar(segundoFator) {
+    erro.hidden = true;
+    const emissao = await fetch('/idp-fake/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ promotorId: seletor.value, segundoFator }),
+    });
+    const { idToken } = await emissao.json();
+    const resposta = await api('/api/sessao', { method: 'POST', body: JSON.stringify({ idToken }) });
+    if (!resposta.ok) {
+      const corpo = await resposta.json();
+      erro.textContent = 'O Backend recusou o token: ' + corpo.erro + '. Nenhuma sessão foi criada.';
+      erro.hidden = false;
+      return;
+    }
+    const sessao = await resposta.json();
+    Sessao.guardar(sessao.tokenSessao);
+    location.href = 'transcricoes.html';
+  }
+
+  document.getElementById('entrar').addEventListener('click', () => entrar(true));
+  document.getElementById('entrar-sem-mfa').addEventListener('click', () => entrar(false));
+</script>
+</body>
+</html>
