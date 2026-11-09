@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Minhas transcrições</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="screen">
+  <div class="header">
+    <div class="row" style="gap:40px">
+      <div class="brand">Transcrição de Mídias</div>
+      <nav><a class="active">Minhas transcrições</a></nav>
+    </div>
+    <div class="user"><span data-usuario></span> <a href="#" data-sair>Sair</a></div>
+  </div>
+  <div class="content">
+    <div class="row between">
+      <div>
+        <h1>Minhas transcrições</h1>
+        <p class="muted">Agrupadas por processo. Somente as transcrições solicitadas por você aparecem aqui.</p>
+      </div>
+    </div>
+    <div id="grupos"></div>
+    <div class="callout" style="margin-top:24px">A lista vem de <span class="mono">GET /api/transcricoes</span>, filtrada pelo promotor da sessão (RQF5). Abrir e Excluir chamam rotas com o id da transcrição, onde o Backend confere a propriedade antes de qualquer operação (RS01). Excluir só fica disponível para transcrições finalizadas ou com falha (RQF9).</div>
+  </div>
+  <div class="backdrop" id="confirmacao" hidden>
+    <div class="modal">
+      <h1>Excluir transcrição?</h1>
+      <p>A transcrição de <strong id="midia-excluir"></strong> e a cópia da mídia serão removidas do Storage. Esta ação não pode ser desfeita.</p>
+      <p class="muted small">A mídia original permanece no Sistema Processos. Uma nova transcrição pode ser solicitada depois.</p>
+      <div class="actions">
+        <button class="btn secondary" id="cancelar">Cancelar</button>
+        <button class="btn" id="confirmar" style="background:var(--danger);border-color:var(--danger)">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
