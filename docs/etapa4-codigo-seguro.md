@@ -30,7 +30,15 @@ A conta do promotor é institucional e a senha pode vazar por phishing ou reutil
 
 #### 2.2 Testes definidos antes da implementação
 
-Pendente.
+Cenário comum: o teste gera o par de chaves do provedor de identidade, entrega a chave pública ao Backend e assina os tokens com a privada. Todos os tokens têm emissor e sujeito válidos.
+
+| Teste | Entrada ou ação | Resultado esperado |
+| --- | --- | --- |
+| TS01 (malicioso) | Token assinado com a chave do provedor, com audiência e prazo válidos e `amr` igual a `["pwd"]`, enviado a `POST /api/sessao` | 401 com o corpo `{"erro":"erro de autenticação"}` e sem `tokenSessao`. O número de sessões ativas não muda. Uma rota de dados sem sessão continua respondendo 401 |
+| TS02 (válido) | O mesmo token com `amr` igual a `["pwd","mfa"]` | 200 com `tokenSessao` e `promotorId`. `GET /api/transcricoes` com esse token de sessão responde 200 |
+| TS03 (contrato) | Três tokens com `amr` contendo `mfa`: um assinado por outra chave, um com audiência de outro serviço e um expirado | 401 nos três, sem `tokenSessao` |
+
+Os testes estão em [SessaoSegundoFatorTest.java](../prototipo/src/test/java/br/grupo1/transcricao/pratica1/SessaoSegundoFatorTest.java). A classe entrou no repositório antes do validador e do controller de sessão.
 
 #### 2.3 Implementação
 
