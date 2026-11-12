@@ -27,7 +27,7 @@ Sem Docker, com Java 21, o Maven Wrapper faz o mesmo: `./mvnw test` e `./mvnw sp
 | Componente do HLD | No protótipo |
 | --- | --- |
 | Backend | Spring Boot, com o filtro de sessão e as rotas das práticas |
-| Provedor de Identidade | Chega com a prática 1: um provedor simulado, ativo só na demonstração, e a validação do token de identidade |
+| Provedor de Identidade | Simulado em `/idp-fake`, ativo com `idp.fake=true`. Gera um par de chaves RSA a cada início e emite o token de identidade com ou sem o segundo fator no claim `amr`. Com um provedor real, desligue o fake e informe a chave pública em `idp.chave-publica` |
 | Registro de transcrições | H2 em memória, com dados iniciais de dois promotores em `DadosIniciais` |
 | Storage | O texto da transcrição fica numa coluna do registro |
 | Sistema Processos, Fila, Módulo I.A, I.A | Fora do protótipo. Os status das transcrições são fixos nos dados iniciais |
@@ -39,8 +39,11 @@ A sessão é um token opaco de 256 bits guardado em memória no Backend e enviad
 
 | Rota | Sessão | Descrição |
 | --- | --- | --- |
+| `POST /api/sessao` | não | Cria a sessão a partir do token de identidade (RQF1, prática 1) |
+| `GET /api/sessao` | sim | Promotor da sessão |
+| `DELETE /api/sessao` | sim | Encerra a sessão (RQF11) |
 | `GET /api/transcricoes` | sim | Transcrições do promotor da sessão (RQF5) |
 | `GET /api/transcricoes/{id}` | sim | Abre uma transcrição do promotor da sessão (RQF6, prática 2) |
 | `DELETE /api/transcricoes/{id}` | sim | Exclui uma transcrição do promotor da sessão (RQF9, prática 2) |
-
-A criação e o encerramento da sessão chegam com a prática 1. Até lá, os testes criam a sessão direto no `SessaoStore`.
+| `GET /idp-fake/promotores` | não | Contas conhecidas pelo provedor simulado |
+| `POST /idp-fake/token` | não | Emite o token de identidade; `segundoFator` controla o claim `amr` |
