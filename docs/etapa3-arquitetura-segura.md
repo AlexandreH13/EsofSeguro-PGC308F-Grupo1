@@ -83,6 +83,9 @@ flowchart LR
     UI -->|"requisições com sessão"| AUTZ
     AUTZ -->|"resposta permitida ou negada"| UI
     UI -->|"exibe resultado"| P
+    AUTZ -->|"publica pedido de transcrição"| F["Fila"]
+    F -->|"entrega pedido"| M["Módulo I.A"]
+    M -->|"atualiza status"| ST["ST<br/>Recebe atualização de status"]
 
     %% ===== Fim da parte 1 =====
 
