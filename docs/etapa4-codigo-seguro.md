@@ -30,15 +30,61 @@ A conta do promotor é institucional e a senha pode vazar por phishing ou reutil
 
 #### 2.2 Testes definidos antes da implementação
 
-Pendente.
+Cenário comum: o teste gera o par de chaves do provedor de identidade, entrega a chave pública ao Backend e assina os tokens com a privada. Todos os tokens têm emissor e sujeito válidos.
+
+| Teste | Entrada ou ação | Resultado esperado |
+| --- | --- | --- |
+| TS01 (malicioso) | Token assinado com a chave do provedor, com audiência e prazo válidos e `amr` igual a `["pwd"]`, enviado a `POST /api/sessao` | 401 com o corpo `{"erro":"erro de autenticação"}` e sem `tokenSessao`. O número de sessões ativas não muda. Uma rota de dados sem sessão continua respondendo 401 |
+| TS02 (válido) | O mesmo token com `amr` igual a `["pwd","mfa"]` | 200 com `tokenSessao` e `promotorId`. `GET /api/transcricoes` com esse token de sessão responde 200 |
+| TS03 (contrato) | Três tokens com `amr` contendo `mfa`: um assinado por outra chave, um com audiência de outro serviço e um expirado | 401 nos três, sem `tokenSessao` |
+
+Os testes estão em [SessaoSegundoFatorTest.java](../prototipo/src/test/java/br/grupo1/transcricao/pratica1/SessaoSegundoFatorTest.java). A classe entrou no repositório antes do validador e do controller de sessão.
 
 #### 2.3 Implementação
 
-Pendente.
+O validador `sessao/TokenIdentidadeValidador.java` recebe a chave pública do provedor, o emissor e a audiência esperados e um relógio. A ordem das verificações é fixa: algoritmo de assinatura RS256, assinatura, emissor, audiência, prazo, sujeito e, por fim, o claim `amr`:
+
+```java
+if (!JWSAlgorithm.RS256.equals(jwt.getHeader().getAlgorithm())) {
+    throw new TokenRecusado("algoritmo de assinatura inesperado");
+}
+if (!jwt.verify(new RSASSAVerifier(chavePublica))) {
+    throw new TokenRecusado("assinatura inválida");
+}
+// ... emissor, audiência, prazo e sujeito ...
+List<String> metodos = claims.getStringListClaim("amr");
+if (metodos == null || !metodos.contains("mfa")) {
+    // RS02: assinatura, emissor, audiência e prazo válidos não bastam sem o segundo fator
+    throw new TokenRecusado("autenticação sem segundo fator");
+}
+```
+
+A conferência explícita do algoritmo fecha a troca de algoritmo e o `alg: none`, dois ataques clássicos contra validadores de JWT. Qualquer falha vira `TokenRecusado` com o motivo.
+
+O controller `sessao/SessaoController.java` chama o validador em `POST /api/sessao`. Em caso de recusa, grava o motivo no log e responde 401 com uma mensagem genérica, para não orientar quem forja tokens. Em caso de sucesso, pede ao `sessao/SessaoStore.java` um token de sessão opaco, com 256 bits de `SecureRandom`, e devolve ao cliente. O token de identidade não é guardado nem reaproveitado como sessão: a partir daí só o token opaco circula, e `DELETE /api/sessao` o invalida (RQF11).
+
+A chave pública vem de `sessao/IdpConfig.java`: da propriedade `idp.chave-publica`, quando o provedor real existe, ou do provedor simulado em `demo/IdpFakeController.java`, ativo apenas com `idp.fake=true`. O simulado gera o par de chaves em memória a cada início e nunca grava a chave privada, para não existir segredo no repositório. Na tela T1 ele emite o token com ou sem o segundo fator, o que permite demonstrar TS01 e TS02 no navegador.
 
 #### 2.4 Resultado esperado e obtido
 
-Pendente.
+O critério de verificação do RS02 pede que um token assinado pelo provedor, com emissor, audiência e prazo válidos mas sem a indicação de segundo fator, não crie sessão, receba erro de autenticação e não abra nenhuma rota de dados, e que o mesmo token com `amr` contendo `mfa` crie a sessão. TS01 e TS02 cobrem exatamente essas duas situações e TS03 confirma que o segundo fator não substitui as demais verificações.
+
+Antes da implementação, com a classe de teste no repositório e sem o controller de sessão, os três testes falham porque a rota não existe:
+
+```
+Tests run: 3, Failures: 3, Errors: 0, Skipped: 0 <<< FAILURE! -- in br.grupo1.transcricao.pratica1.SessaoSegundoFatorTest
+SessaoSegundoFatorTest.ts01_tokenValidoSemSegundoFatorNaoCriaSessao:67 Status expected:<401> but was:<404>
+SessaoSegundoFatorTest.ts02_tokenComSegundoFatorCriaSessaoQueAbreAsRotasDeDados:80 Status expected:<200> but was:<404>
+SessaoSegundoFatorTest.ts03_tokenForaDoContratoEhRecusadoMesmoComSegundoFator:97 Status expected:<401> but was:<404>
+```
+
+Depois da implementação, os três passam:
+
+```
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0 -- in br.grupo1.transcricao.pratica1.SessaoSegundoFatorTest
+```
+
+Na interface, o botão "Simular login sem segundo fator" da tela T1 reproduz o TS01: o Backend responde 401, a tela informa que nenhuma sessão foi criada e o log registra `Token de identidade recusado: autenticação sem segundo fator`.
 
 #### 2.5 Referências OWASP
 
