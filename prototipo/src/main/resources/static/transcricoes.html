@@ -21,14 +21,16 @@
         <p class="muted">Agrupadas por processo. Somente as transcrições solicitadas por você aparecem aqui.</p>
       </div>
     </div>
+    <div id="estado-lista" class="callout" role="status">Carregando transcrições...</div>
     <div id="grupos"></div>
     <div class="callout" style="margin-top:24px">A lista vem de <span class="mono">GET /api/transcricoes</span>, filtrada pelo promotor da sessão (RQF5). Abrir e Excluir chamam rotas com o id da transcrição, onde o Backend confere a propriedade antes de qualquer operação (RS01). Excluir só fica disponível para transcrições finalizadas ou com falha (RQF9).</div>
   </div>
   <div class="backdrop" id="confirmacao" hidden>
-    <div class="modal">
-      <h1>Excluir transcrição?</h1>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-confirmacao">
+      <h1 id="titulo-confirmacao">Excluir transcrição?</h1>
       <p>A transcrição de <strong id="midia-excluir"></strong> e a cópia da mídia serão removidas do Storage. Esta ação não pode ser desfeita.</p>
       <p class="muted small">A mídia original permanece no Sistema Processos. Uma nova transcrição pode ser solicitada depois.</p>
+      <div id="erro-exclusao" class="callout warn" role="alert" hidden></div>
       <div class="actions">
         <button class="btn secondary" id="cancelar">Cancelar</button>
         <button class="btn" id="confirmar" style="background:var(--danger);border-color:var(--danger)">Excluir</button>
@@ -36,5 +38,11 @@
     </div>
   </div>
 </div>
+<script src="app.js"></script>
+<script>
+  exigirSessao();
+  montarCabecalho();
+  inicializarTranscricoes();
+</script>
 </body>
 </html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sessão encerrada</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="screen">
+  <div class="header">
+    <div class="brand">Transcrição de Mídias <small>Ministério Público do Estado</small></div>
+  </div>
+  <main class="content">
+    <section class="card center">
+      <h1>Sessão encerrada</h1>
+      <p class="muted">Você saiu do sistema. O chat com a IA e seu contexto foram descartados.</p>
+      <p style="margin-top:20px"><a class="btn secondary block" href="index.html">Entrar novamente</a></p>
+      <p class="muted small" style="margin-top:16px">Sua sessão no provedor de identidade do Ministério Público continua ativa. Para encerrá-la também, saia por lá.</p>
+    </section>
+  </main>
+</div>
+<script>
+  sessionStorage.removeItem('tokenSessao');
+</script>
+</body>
+</html>
