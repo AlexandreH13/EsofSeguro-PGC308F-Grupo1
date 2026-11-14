@@ -3,8 +3,12 @@ package br.grupo1.transcricao.transcricao;
 import br.grupo1.transcricao.auditoria.Auditoria;
 import br.grupo1.transcricao.sessao.Sessao;
 import br.grupo1.transcricao.sessao.SessaoFilter;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ContentDisposition;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,6 +75,26 @@ public class TranscricaoController {
                 .orElseGet(() -> acessoNegado(sessao, id, "abrir"));
     }
 
+    @GetMapping("/{id}/docx")
+    public ResponseEntity<?> baixarDocx(@PathVariable("id") UUID id,
+                                        @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
+        var encontrada = repositorio.findByIdAndPromotorId(id, sessao.promotorId());
+        if (encontrada.isEmpty()) return acessoNegado(sessao, id, "baixar");
+        Transcricao transcricao = encontrada.get();
+        if (transcricao.getStatus() != StatusTranscricao.FINALIZADA || transcricao.getTexto() == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Erro("transcrição ainda não disponível"));
+        }
+
+        byte[] arquivo = gerarDocx(transcricao);
+        HttpHeaders cabecalhos = new HttpHeaders();
+        cabecalhos.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        cabecalhos.setContentDisposition(ContentDisposition.attachment()
+                .filename("transcricao-" + id + ".docx", StandardCharsets.UTF_8).build());
+        cabecalhos.setContentLength(arquivo.length);
+        return new ResponseEntity<>(arquivo, cabecalhos, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluir(@PathVariable("id") UUID id,
                                      @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
@@ -90,5 +117,19 @@ public class TranscricaoController {
         // Só o id entra no alerta. O conteúdo da transcrição nunca vai para o log.
         auditoria.alerta("ACESSO_NEGADO", sessao.promotorId(), "operação " + operacao + " na transcrição " + id);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Erro("acesso negado"));
+    }
+
+    private byte[] gerarDocx(Transcricao transcricao) {
+        try (XWPFDocument documento = new XWPFDocument(); ByteArrayOutputStream saida = new ByteArrayOutputStream()) {
+            documento.createParagraph().createRun().setText(transcricao.getMidia());
+            documento.createParagraph().createRun().setText("Processo " + transcricao.getProcesso());
+            for (String linha : transcricao.getTexto().split("\\R", -1)) {
+                documento.createParagraph().createRun().setText(linha);
+            }
+            documento.write(saida);
+            return saida.toByteArray();
+        } catch (IOException erro) {
+            throw new IllegalStateException("falha ao gerar o documento", erro);
+        }
     }
 }
