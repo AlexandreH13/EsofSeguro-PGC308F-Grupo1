@@ -1,6 +1,6 @@
 # Protótipo da Etapa 4
 
-Backend em Java 21 com Spring Boot que implementa as duas práticas de código seguro descritas em [docs/etapa4-codigo-seguro.md](../docs/etapa4-codigo-seguro.md). A interface é um conjunto de páginas estáticas, derivadas dos mockups, servidas pelo próprio backend. Nada aqui é o sistema completo: só o suficiente para exercitar e testar as práticas.
+Backend em Java 21 com Spring Boot que implementa as práticas de código seguro descritas em [docs/etapa4-codigo-seguro.md](../docs/etapa4-codigo-seguro.md) e fluxos demonstrativos das telas T3 a T6. As páginas são servidas pelo próprio backend. Nada aqui é o sistema completo: processamento de mídia, IdP real e IA externa não estão integrados.
 
 ## Executar
 
@@ -18,7 +18,7 @@ Para rodar só os testes e ver a saída completa:
 docker compose run --rm testes
 ```
 
-Uma classe só: `docker compose run --rm testes mvn -B test -Dtest=AutorizacaoTranscricaoTest`. Os testes das práticas ficam em `src/test/java/br/grupo1/transcricao/pratica1` e `pratica2`.
+Uma classe só: `docker compose run --rm testes mvn -B test -Dtest=AutorizacaoTranscricaoTest`. Os testes ficam em `src/test/java/br/grupo1/transcricao/pratica1`, `pratica2` e `pratica3`.
 
 Sem Docker, com Java 21, o Maven Wrapper faz o mesmo: `./mvnw test` e `./mvnw spring-boot:run`. É o caminho para quem usa a IDE.
 
@@ -26,12 +26,13 @@ Sem Docker, com Java 21, o Maven Wrapper faz o mesmo: `./mvnw test` e `./mvnw sp
 
 | Componente do HLD | No protótipo |
 | --- | --- |
-| Backend | Spring Boot, com o filtro de sessão e as rotas das práticas |
+| Backend | Spring Boot, com filtro de sessão, autorização por proprietário, geração de DOCX e API de chat temporário |
 | Provedor de Identidade | Simulado em `/idp-fake`, ativo com `idp.fake=true`. Gera um par de chaves RSA a cada início e emite o token de identidade com ou sem o segundo fator no claim `amr`. Com um provedor real, desligue o fake e informe a chave pública em `idp.chave-publica` |
 | Registro de transcrições | H2 em memória, com dados iniciais de dois promotores em `DadosIniciais` |
 | Storage | O texto da transcrição fica numa coluna do registro |
-| Sistema Processos, Fila, Módulo I.A, I.A | Fora do protótipo. Os status das transcrições são fixos nos dados iniciais |
-| Interface | Chega depois das práticas: páginas estáticas derivadas dos mockups, servidas pelo próprio backend |
+| Sistema Processos, Fila, Módulo I.A | Fora do protótipo. Os status vêm dos dados iniciais e não avançam por processamento real |
+| I.A | Simulada localmente: perguntas recebem uma resposta fixa de demonstração; nenhum dado é enviado a um serviço externo |
+| Interface | T3/T3b lista, agrupa, abre e exclui; T4 mostra a transcrição e baixa DOCX; T5 conversa demonstrativa e temporária; T6 confirma o encerramento |
 
 A sessão é um token opaco de 256 bits guardado em memória no Backend e enviado no cabeçalho `Authorization: Bearer`. Toda rota `/api` sem sessão válida responde 401 com `{"erro":"sessão inválida"}`.
 
@@ -44,6 +45,18 @@ A sessão é um token opaco de 256 bits guardado em memória no Backend e enviad
 | `DELETE /api/sessao` | sim | Encerra a sessão (RQF11) |
 | `GET /api/transcricoes` | sim | Transcrições do promotor da sessão (RQF5) |
 | `GET /api/transcricoes/{id}` | sim | Abre uma transcrição do promotor da sessão (RQF6, prática 2) |
+| `GET /api/transcricoes/{id}/docx` | sim | Gera DOCX somente para transcrição finalizada do próprio promotor (RQF8) |
 | `DELETE /api/transcricoes/{id}` | sim | Exclui uma transcrição do promotor da sessão (RQF9, prática 2) |
+| `POST /api/chats` | sim | Inicia chat temporário para transcrição finalizada do próprio promotor (RQF7) |
+| `GET /api/chats/{id}` | sim | Recupera chat temporário do promotor |
+| `POST /api/chats/{id}/mensagens` | sim | Envia pergunta e recebe resposta demonstrativa (RQF10) |
+| `DELETE /api/chats/{id}` | sim | Descarta chat e histórico em memória |
 | `GET /idp-fake/promotores` | não | Contas conhecidas pelo provedor simulado |
 | `POST /idp-fake/token` | não | Emite o token de identidade; `segundoFator` controla o claim `amr` |
+
+## Limites atuais
+
+- A tela T3 consulta periodicamente itens pendentes, mas o protótipo não tem worker ou endpoint autenticado por mTLS para atualizar os status (RS03 ainda não implementado).
+- O DOCX é gerado localmente a partir do texto armazenado no H2; não há Storage separado nem verificação de hash de arquivo.
+- O chat e seu contexto ficam em memória e são descartados ao encerrar o chat ou a sessão. A resposta é simulada, sem conexão com IA externa.
+- A expiração automática por inatividade não está implementada; o prazo precisa ser definido.
