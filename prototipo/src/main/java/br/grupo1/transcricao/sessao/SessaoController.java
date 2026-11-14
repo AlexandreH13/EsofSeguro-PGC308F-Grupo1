@@ -1,5 +1,6 @@
 package br.grupo1.transcricao.sessao;
 
+import br.grupo1.transcricao.transcricao.ChatStore;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +31,12 @@ public class SessaoController {
 
     private final TokenIdentidadeValidador validador;
     private final SessaoStore sessoes;
+    private final ChatStore chats;
 
-    public SessaoController(TokenIdentidadeValidador validador, SessaoStore sessoes) {
+    public SessaoController(TokenIdentidadeValidador validador, SessaoStore sessoes, ChatStore chats) {
         this.validador = validador;
         this.sessoes = sessoes;
+        this.chats = chats;
     }
 
     @PostMapping
@@ -56,7 +59,10 @@ public class SessaoController {
 
     @DeleteMapping
     public ResponseEntity<Void> encerrar(HttpServletRequest requisicao) {
-        SessaoFilter.extrairToken(requisicao).ifPresent(sessoes::encerrar);
+        SessaoFilter.extrairToken(requisicao).ifPresent(token -> {
+            sessoes.buscar(token).ifPresent(sessao -> chats.encerrarDoPromotor(sessao.promotorId()));
+            sessoes.encerrar(token);
+        });
         return ResponseEntity.noContent().build();
     }
 }
