@@ -6,6 +6,7 @@ import br.grupo1.transcricao.sessao.SessaoStore;
 import br.grupo1.transcricao.transcricao.StatusTranscricao;
 import br.grupo1.transcricao.transcricao.Transcricao;
 import br.grupo1.transcricao.transcricao.TranscricaoRepository;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -26,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -105,6 +108,39 @@ class AutorizacaoTranscricaoTest {
                 .andExpect(status().isNoContent());
         assertFalse(repositorio.existsById(deA.getId()));
         assertTrue(auditoria.alertas().isEmpty(), "acesso legítimo não gera alerta");
+    }
+
+    @Test
+    void ts05_baixarDocxDaPropriaTranscricaoGeraDocumentoValido() throws Exception {
+        byte[] conteudo = comoA(get("/api/transcricoes/{id}/docx", deA.getId()))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Disposition", containsString("attachment")))
+                .andReturn().getResponse().getContentAsByteArray();
+
+        try (XWPFDocument documento = new XWPFDocument(new ByteArrayInputStream(conteudo))) {
+            assertTrue(documento.getParagraphs().stream()
+                    .anyMatch(paragrafo -> paragrafo.getText().contains(TEXTO_DE_A)));
+        }
+        assertTrue(auditoria.alertas().isEmpty(), "download legítimo não gera alerta");
+    }
+
+    @Test
+    void ts05_baixarDocxDeOutroPromotorEhNegado() throws Exception {
+        comoA(get("/api/transcricoes/{id}/docx", deB.getId()))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string(not(containsString(TEXTO_DE_B))));
+        assertAlertaDeAcessoNegado(deB.getId());
+    }
+
+    @Test
+    void ts05_baixarDocxAntesDaFinalizacaoEhRecusado() throws Exception {
+        Transcricao pendente = repositorio.save(new Transcricao("promotor-a", "0000000-00.2026.8.26.0000",
+            "Vara de teste", "pendente.mp3", StatusTranscricao.EM_PROCESSAMENTO,
+            null, Instant.now(), null));
+
+        comoA(get("/api/transcricoes/{id}/docx", pendente.getId()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.erro").value("transcrição ainda não disponível"));
     }
 
     @Test
