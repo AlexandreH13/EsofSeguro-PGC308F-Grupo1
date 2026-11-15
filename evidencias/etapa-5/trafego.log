@@ -1,0 +1,48 @@
+ZAP 2.17.0 no ar.
+== Tráfego do roteiro pelo proxy do ZAP
+[ok] GET / -> 200 (esperado 200). Página estática.
+[ok] GET /index.html -> 200 (esperado 200). Página estática.
+[ok] GET /estilo.css -> 200 (esperado 200). Página estática.
+[ok] GET /app.js -> 200 (esperado 200). Página estática.
+[ok] GET /transcricoes.html -> 200 (esperado 200). Página estática.
+[ok] GET /transcricao.html -> 200 (esperado 200). Página estática.
+[ok] GET /sessao-encerrada.html -> 200 (esperado 200). Página estática.
+[ok] GET /idp-fake/promotores -> 200 (esperado 200). Contas do IdP simulado (tela T1).
+-- Prática 1: sessão só com segundo fator (RS02)
+[ok] POST /idp-fake/token -> 200 (esperado 200). IdP simulado emite token de promotor-a, segundoFator=false.
+[ok] POST /api/sessao -> 401 (esperado 401). TS01: token válido sem mfa não cria sessão.
+[ok] POST /idp-fake/token -> 200 (esperado 200). IdP simulado emite token de promotor-a, segundoFator=true.
+[ok] POST /api/sessao -> 200 (esperado 200). TS02: token com mfa cria a sessão de Ana.
+[ok] POST /api/sessao -> 401 (esperado 401). Payload adulterado com a assinatura original.
+[ok] POST /api/sessao -> 401 (esperado 401). Claim amr forjado no token sem mfa.
+[ok] POST /api/sessao -> 401 (esperado 401). Assinatura inválida.
+[ok] POST /api/sessao -> 401 (esperado 401). Token vazio.
+[ok] POST /idp-fake/token -> 200 (esperado 200). IdP simulado emite token de promotor-b, segundoFator=true.
+[ok] POST /api/sessao -> 200 (esperado 200). Sessão de Beatriz.
+-- Rotas de dados sem sessão
+[ok] GET /api/transcricoes -> 401 (esperado 401). Sem cabeçalho Authorization.
+[ok] GET /api/transcricoes -> 401 (esperado 401). Token de sessão inventado.
+[ok] GET /api/transcricoes -> 401 (esperado 401). Token de identidade usado no lugar da sessão.
+-- Uso legítimo
+[ok] GET /api/sessao -> 200 (esperado 200). Promotor da sessão de Ana.
+[ok] GET /api/transcricoes -> 200 (esperado 200). Lista de Ana.
+[ok] GET /api/transcricoes/1e14c43a-f6fb-4a59-bfc7-81d50e3a9fa0 -> 200 (esperado 200). Ana abre a própria transcrição (NA_FILA).
+[ok] GET /api/transcricoes/0d58f10e-ffc0-4bd7-82fe-0dcc7269fb9f -> 200 (esperado 200). Ana abre a própria transcrição (EM_PROCESSAMENTO).
+[ok] GET /api/transcricoes/44d53d09-743b-4d99-89a0-d710f46c753c -> 200 (esperado 200). Ana abre a própria transcrição (FINALIZADA).
+[ok] GET /api/transcricoes/d9a290da-9c70-4762-bf45-4b3aa21e75b1 -> 200 (esperado 200). Ana abre a própria transcrição (FALHA).
+[ok] GET /api/transcricoes -> 200 (esperado 200). Lista de Beatriz.
+[ok] GET /api/transcricoes/ce727f44-6cf2-42bb-b100-a1b1fd9410a2 -> 200 (esperado 200). Beatriz abre a própria transcrição.
+-- Prática 2: autorização por propriedade do recurso (RS01)
+[ok] GET /api/transcricoes/44d53d09-743b-4d99-89a0-d710f46c753c -> 403 (esperado 403). TS04: Beatriz tenta abrir transcrição de Ana.
+[ok] DELETE /api/transcricoes/44d53d09-743b-4d99-89a0-d710f46c753c -> 403 (esperado 403). TS04: Beatriz tenta excluir transcrição de Ana.
+[ok] GET /api/transcricoes/00000000-0000-0000-0000-000000000000 -> 403 (esperado 403). TS04: id inexistente recebe a mesma resposta.
+[ok] GET /api/transcricoes/1 -> 400 (esperado 400). Id fora do formato UUID.
+[ok] DELETE /api/transcricoes/0d58f10e-ffc0-4bd7-82fe-0dcc7269fb9f -> 409 (esperado 409). Exclusão durante o processamento.
+[ok] DELETE /api/transcricoes/d9a290da-9c70-4762-bf45-4b3aa21e75b1 -> 204 (esperado 204). Ana exclui a própria transcrição com falha.
+[ok] GET /api/transcricoes/44d53d09-743b-4d99-89a0-d710f46c753c -> 200 (esperado 200). Transcrição de Ana segue intacta.
+-- Encerramento
+[ok] DELETE /api/sessao -> 204 (esperado 204). Beatriz sai.
+[ok] GET /api/transcricoes -> 401 (esperado 401). Token de Beatriz depois de sair.
+== Scan passivo e ativo
+Spider: 23 URLs.
+Scan ativo: 0 min 12 s, 10241 mensagens.
