@@ -1,0 +1,11 @@
+Data: 2026-11-15T18:51:45+00:00
+ZAP: 2.17.0
+Alvo: http://transcricao:8080 (serviço transcricao do compose)
+Contexto: transcricao, inclui http://transcricao:8080.*; scan ativo exclui http://transcricao:8080/api/sessao
+Autenticação: cabeçalho Authorization: Bearer com a sessão de Ana, injetado pela regra replacer
+Política do scan ativo: padrão do ZAP; vetores de entrada query, corpo e caminho
+URLs no contexto (23): , /, /api, /api/sessao, /api/transcricoes, /api/transcricoes/00000000-0000-0000-0000-000000000000, /api/transcricoes/0d58f10e-ffc0-4bd7-82fe-0dcc7269fb9f, /api/transcricoes/1, /api/transcricoes/1e14c43a-f6fb-4a59-bfc7-81d50e3a9fa0, /api/transcricoes/44d53d09-743b-4d99-89a0-d710f46c753c, /api/transcricoes/ce727f44-6cf2-42bb-b100-a1b1fd9410a2, /api/transcricoes/d9a290da-9c70-4762-bf45-4b3aa21e75b1, /app.js, /estilo.css, /idp-fake, /idp-fake/promotores, /idp-fake/token, /index.html, /robots.txt, /sessao-encerrada.html, /sitemap.xml, /transcricao.html, /transcricoes.html
+Mensagens no histórico: 10311
+Mensagens do scan ativo: 10241
+Duração do scan ativo: 12 s
+Alertas por risco: {"High": 0, "Low": 18, "Medium": 12, "Informational": 7}

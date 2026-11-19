@@ -41,7 +41,54 @@ docker compose run --rm zap
 
 ### 4. Evidência da execução
 
-Pendente.
+Os arquivos estão em [evidencias/etapa-5](../evidencias/etapa-5):
+
+| Arquivo | Conteúdo |
+| --- | --- |
+| `zap-relatorio.html` | Relatório completo do ZAP, com descrição, instâncias e solução de cada alerta |
+| `zap-relatorio.json` | O mesmo relatório em JSON |
+| `alertas.md` | Resumo dos alertas por risco, com regra, ocorrências e exemplo de URL |
+| `trafego.log` | As 38 chamadas do roteiro, com o status obtido e o esperado em cada uma |
+| `sessao.txt` | Data, versão do ZAP, contexto, URLs cobertas, mensagens e duração |
+| `relatorio-zap-resumo.png` e `relatorio-zap-alertas.png` | Capturas do relatório HTML |
+
+Números da sessão de 15/11/2026: 23 URLs no contexto, 10.311 mensagens no histórico, das quais 10.241 do scan ativo, que durou 12 segundos. Nenhum alerta alto. Dois médios, um baixo e dois informativos:
+
+| Risco | Alerta | Regra | Ocorrências |
+| --- | --- | --- | --- |
+| Médio | Content Security Policy (CSP) Header Not Set | 10038 | 6 |
+| Médio | Missing Anti-clickjacking Header | 10020 | 6 |
+| Baixo | X-Content-Type-Options Header Missing | 10021 | 18 |
+| Informativo | Modern Web Application | 10109 | 5 |
+| Informativo | Session Management Response Identified | 10112 | 2 |
+
+![Resumo do relatório do ZAP](../evidencias/etapa-5/relatorio-zap-resumo.png)
+
+O tráfego do roteiro terminou com todas as chamadas no status esperado. Trecho do `trafego.log`:
+
+```
+[ok] POST /api/sessao -> 401 (esperado 401). TS01: token válido sem mfa não cria sessão.
+[ok] POST /api/sessao -> 200 (esperado 200). TS02: token com mfa cria a sessão de Ana.
+[ok] POST /api/sessao -> 401 (esperado 401). Payload adulterado com a assinatura original.
+[ok] GET /api/transcricoes/44d53d09-743b-4d99-89a0-d710f46c753c -> 403 (esperado 403). TS04: Beatriz tenta abrir transcrição de Ana.
+[ok] GET /api/transcricoes/00000000-0000-0000-0000-000000000000 -> 403 (esperado 403). TS04: id inexistente recebe a mesma resposta.
+```
+
+A ausência dos cabeçalhos se confirma fora do ZAP, na resposta da aplicação (porta publicada nesta máquina):
+
+```
+$ curl -sI http://localhost:8080/index.html
+HTTP/1.1 200
+Last-Modified: Sun, 15 Nov 2026 15:54:32 GMT
+Accept-Ranges: bytes
+Content-Type: text/html
+Content-Length: 2913
+
+$ curl -sI http://localhost:8080/idp-fake/promotores
+HTTP/1.1 200
+Content-Type: application/json
+Content-Length: 133
+```
 
 ---
 
