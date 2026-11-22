@@ -3,6 +3,7 @@ package br.grupo1.transcricao.transcricao;
 import br.grupo1.transcricao.auditoria.Auditoria;
 import br.grupo1.transcricao.sessao.Sessao;
 import br.grupo1.transcricao.sessao.SessaoFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,12 +48,13 @@ public class ChatController {
 
     @PostMapping
     public ResponseEntity<?> iniciar(@RequestBody(required = false) Iniciar pedido,
-                                     @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
+                                     @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao,
+                                     HttpServletRequest requisicao) {
         if (pedido == null || pedido.transcricaoId() == null) {
             return ResponseEntity.badRequest().body(new Erro("transcrição obrigatória"));
         }
         var transcricao = transcricoes.findByIdAndPromotorId(pedido.transcricaoId(), sessao.promotorId());
-        if (transcricao.isEmpty()) return acessoNegado(sessao, pedido.transcricaoId());
+        if (transcricao.isEmpty()) return acessoNegado(sessao, pedido.transcricaoId(), requisicao);
         Transcricao recurso = transcricao.get();
         if (recurso.getStatus() != StatusTranscricao.FINALIZADA || recurso.getTexto() == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Erro("transcrição ainda não disponível"));
@@ -62,34 +64,39 @@ public class ChatController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> consultar(@PathVariable UUID id,
-                                       @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
+                                       @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao,
+                                       HttpServletRequest requisicao) {
         return chats.buscar(id, sessao.promotorId())
                 .<ResponseEntity<?>>map(conversa -> ResponseEntity.ok(Visao.de(conversa)))
-                .orElseGet(() -> acessoNegado(sessao, id));
+                .orElseGet(() -> acessoNegado(sessao, id, requisicao));
     }
 
     @PostMapping("/{id}/mensagens")
     public ResponseEntity<?> perguntar(@PathVariable UUID id, @RequestBody(required = false) Pergunta pedido,
-                                       @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
+                                       @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao,
+                                       HttpServletRequest requisicao) {
         if (pedido == null || pedido.texto() == null || pedido.texto().isBlank() || pedido.texto().length() > 4000) {
             return ResponseEntity.badRequest().body(new Erro("pergunta inválida"));
         }
         var conversa = chats.buscar(id, sessao.promotorId());
-        if (conversa.isEmpty()) return acessoNegado(sessao, id);
+        if (conversa.isEmpty()) return acessoNegado(sessao, id, requisicao);
         chats.perguntar(conversa.get(), pedido.texto().trim());
         return ResponseEntity.ok(Visao.de(conversa.get()));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> encerrar(@PathVariable UUID id,
-                                      @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
-        if (chats.buscar(id, sessao.promotorId()).isEmpty()) return acessoNegado(sessao, id);
+                                      @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao,
+                                      HttpServletRequest requisicao) {
+        if (chats.buscar(id, sessao.promotorId()).isEmpty()) return acessoNegado(sessao, id, requisicao);
         chats.encerrar(id);
         return ResponseEntity.noContent().build();
     }
 
-    private ResponseEntity<Erro> acessoNegado(Sessao sessao, UUID id) {
-        auditoria.alerta("ACESSO_NEGADO", sessao.promotorId(), "operação no chat " + id);
+    private ResponseEntity<Erro> acessoNegado(Sessao sessao, UUID id, HttpServletRequest requisicao) {
+        auditoria.alerta("ACESSO_NEGADO", sessao.promotorId(),
+                "operação no chat " + id + " rota=" + requisicao.getMethod() + " " + requisicao.getRequestURI()
+                        + " origem=" + requisicao.getRemoteAddr());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Erro("acesso negado"));
     }
 }
