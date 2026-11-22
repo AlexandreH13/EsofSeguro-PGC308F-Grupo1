@@ -1,5 +1,6 @@
 package br.grupo1.transcricao.sessao;
 
+import br.grupo1.transcricao.auditoria.Auditoria;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +21,11 @@ public class SessaoFilter extends OncePerRequestFilter {
     public static final String ATRIBUTO_SESSAO = "sessao";
 
     private final SessaoStore sessoes;
+    private final Auditoria auditoria;
 
-    public SessaoFilter(SessaoStore sessoes) {
+    public SessaoFilter(SessaoStore sessoes, Auditoria auditoria) {
         this.sessoes = sessoes;
+        this.auditoria = auditoria;
     }
 
     @Override
@@ -37,6 +40,9 @@ public class SessaoFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         Optional<Sessao> sessao = extrairToken(requisicao).flatMap(sessoes::buscar);
         if (sessao.isEmpty()) {
+            auditoria.evento("REQUISICAO_SEM_SESSAO", "-",
+                    "rota=" + requisicao.getMethod() + " " + requisicao.getRequestURI()
+                            + " origem=" + requisicao.getRemoteAddr());
             resposta.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             resposta.setContentType("application/json");
             resposta.setCharacterEncoding("UTF-8");

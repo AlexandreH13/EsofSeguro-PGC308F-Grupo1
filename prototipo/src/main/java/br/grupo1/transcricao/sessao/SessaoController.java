@@ -1,5 +1,6 @@
 package br.grupo1.transcricao.sessao;
 
+import br.grupo1.transcricao.auditoria.Auditoria;
 import br.grupo1.transcricao.transcricao.ChatStore;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -32,22 +33,27 @@ public class SessaoController {
     private final TokenIdentidadeValidador validador;
     private final SessaoStore sessoes;
     private final ChatStore chats;
+    private final Auditoria auditoria;
 
-    public SessaoController(TokenIdentidadeValidador validador, SessaoStore sessoes, ChatStore chats) {
+    public SessaoController(TokenIdentidadeValidador validador, SessaoStore sessoes, ChatStore chats, Auditoria auditoria) {
         this.validador = validador;
         this.sessoes = sessoes;
         this.chats = chats;
+        this.auditoria = auditoria;
     }
 
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody(required = false) Pedido pedido) {
+    public ResponseEntity<?> criar(@RequestBody(required = false) Pedido pedido, HttpServletRequest requisicao) {
         try {
             var identidade = validador.validar(pedido == null ? null : pedido.idToken());
             String token = sessoes.criar(new Sessao(identidade.promotorId(), identidade.nome()));
+            auditoria.evento("SESSAO_CRIADA", identidade.promotorId(),
+                    "amr=mfa origem=" + requisicao.getRemoteAddr());
             return ResponseEntity.ok(new Criada(token, identidade.promotorId(), identidade.nome()));
         } catch (TokenIdentidadeValidador.TokenRecusado recusa) {
             // O motivo fica no log. A resposta é genérica para não orientar quem forja tokens.
             log.warn("Token de identidade recusado: {}", recusa.getMessage());
+            auditoria.evento("TOKEN_RECUSADO", "-", "motivo=" + recusa.getMessage() + " origem=" + requisicao.getRemoteAddr());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Erro("erro de autenticação"));
         }
     }
@@ -60,7 +66,11 @@ public class SessaoController {
     @DeleteMapping
     public ResponseEntity<Void> encerrar(HttpServletRequest requisicao) {
         SessaoFilter.extrairToken(requisicao).ifPresent(token -> {
-            sessoes.buscar(token).ifPresent(sessao -> chats.encerrarDoPromotor(sessao.promotorId()));
+            sessoes.buscar(token).ifPresent(sessao -> {
+                chats.encerrarDoPromotor(sessao.promotorId());
+                auditoria.evento("SESSAO_ENCERRADA", sessao.promotorId(),
+                        "motivo=saida origem=" + requisicao.getRemoteAddr());
+            });
             sessoes.encerrar(token);
         });
         return ResponseEntity.noContent().build();

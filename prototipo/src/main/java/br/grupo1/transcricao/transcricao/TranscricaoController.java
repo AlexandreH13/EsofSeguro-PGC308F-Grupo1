@@ -3,6 +3,7 @@ package br.grupo1.transcricao.transcricao;
 import br.grupo1.transcricao.auditoria.Auditoria;
 import br.grupo1.transcricao.sessao.Sessao;
 import br.grupo1.transcricao.sessao.SessaoFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
@@ -69,17 +70,23 @@ public class TranscricaoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> abrir(@PathVariable("id") UUID id,
-                                   @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
+                                   @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao,
+                                   HttpServletRequest requisicao) {
         return repositorio.findByIdAndPromotorId(id, sessao.promotorId())
-                .<ResponseEntity<?>>map(t -> ResponseEntity.ok(Detalhe.de(t)))
-                .orElseGet(() -> acessoNegado(sessao, id, "abrir"));
+                .<ResponseEntity<?>>map(t -> {
+                    auditoria.evento("TRANSCRICAO_EXIBIDA", sessao.promotorId(),
+                            "id=" + t.getId() + " formato=json " + rota(requisicao));
+                    return ResponseEntity.ok(Detalhe.de(t));
+                })
+                .orElseGet(() -> acessoNegado(sessao, id, "abrir", requisicao));
     }
 
     @GetMapping("/{id}/docx")
     public ResponseEntity<?> baixarDocx(@PathVariable("id") UUID id,
-                                        @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
+                                        @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao,
+                                        HttpServletRequest requisicao) {
         var encontrada = repositorio.findByIdAndPromotorId(id, sessao.promotorId());
-        if (encontrada.isEmpty()) return acessoNegado(sessao, id, "baixar");
+        if (encontrada.isEmpty()) return acessoNegado(sessao, id, "baixar", requisicao);
         Transcricao transcricao = encontrada.get();
         if (transcricao.getStatus() != StatusTranscricao.FINALIZADA || transcricao.getTexto() == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Erro("transcrição ainda não disponível"));
@@ -92,15 +99,18 @@ public class TranscricaoController {
         cabecalhos.setContentDisposition(ContentDisposition.attachment()
                 .filename("transcricao-" + id + ".docx", StandardCharsets.UTF_8).build());
         cabecalhos.setContentLength(arquivo.length);
+        auditoria.evento("TRANSCRICAO_BAIXADA", sessao.promotorId(),
+                "id=" + id + " formato=docx " + rota(requisicao));
         return new ResponseEntity<>(arquivo, cabecalhos, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluir(@PathVariable("id") UUID id,
-                                     @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao) {
+                                     @RequestAttribute(SessaoFilter.ATRIBUTO_SESSAO) Sessao sessao,
+                                     HttpServletRequest requisicao) {
         var encontrada = repositorio.findByIdAndPromotorId(id, sessao.promotorId());
         if (encontrada.isEmpty()) {
-            return acessoNegado(sessao, id, "excluir");
+            return acessoNegado(sessao, id, "excluir", requisicao);
         }
         Transcricao transcricao = encontrada.get();
         if (transcricao.getStatus() == StatusTranscricao.NA_FILA
@@ -113,10 +123,16 @@ public class TranscricaoController {
         return ResponseEntity.noContent().build();
     }
 
-    private ResponseEntity<Erro> acessoNegado(Sessao sessao, UUID id, String operacao) {
+    private ResponseEntity<Erro> acessoNegado(Sessao sessao, UUID id, String operacao, HttpServletRequest requisicao) {
         // Só o id entra no alerta. O conteúdo da transcrição nunca vai para o log.
-        auditoria.alerta("ACESSO_NEGADO", sessao.promotorId(), "operação " + operacao + " na transcrição " + id);
+        auditoria.alerta("ACESSO_NEGADO", sessao.promotorId(),
+                "operação " + operacao + " na transcrição " + id + " " + rota(requisicao));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new Erro("acesso negado"));
+    }
+
+    private static String rota(HttpServletRequest requisicao) {
+        return "rota=" + requisicao.getMethod() + " " + requisicao.getRequestURI()
+                + " origem=" + requisicao.getRemoteAddr();
     }
 
     private byte[] gerarDocx(Transcricao transcricao) {

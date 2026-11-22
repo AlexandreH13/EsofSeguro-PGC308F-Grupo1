@@ -20,6 +20,7 @@ public class Auditoria {
     private static final Logger log = LoggerFactory.getLogger(Auditoria.class);
 
     private final List<Alerta> alertas = new CopyOnWriteArrayList<>();
+    private final List<Alerta> eventos = new CopyOnWriteArrayList<>();
 
     public void alerta(String tipo, String promotorId, String detalhe) {
         Alerta alerta = new Alerta(Instant.now(), tipo, promotorId, detalhe);
@@ -27,11 +28,23 @@ public class Auditoria {
         alertas.add(alerta);
     }
 
+    /** Evento da Etapa 6. Não entra na lista de alertas, para os testes de 403 continuarem contando só o alerta. */
+    public void evento(String tipo, String promotorId, String detalhe) {
+        Alerta evento = new Alerta(Instant.now(), tipo, promotorId, detalhe);
+        log.info("EVENTO {} promotor={} {}", tipo, promotorId, detalhe);
+        eventos.add(evento);
+    }
+
     public List<Alerta> alertas() {
         return List.copyOf(alertas);
     }
 
+    public List<Alerta> eventos() {
+        return List.copyOf(eventos);
+    }
+
     public void limpar() {
         alertas.clear();
+        eventos.clear();
     }
 }
