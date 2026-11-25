@@ -55,14 +55,116 @@ Os eventos E1, E2, E3 e E5 bastam para regras de assinatura sobre autenticação
 
 ### 4. Regras de detecção
 
-Pendente.
+As regras propostas correlacionam os eventos registrados pelo Backend e pelo Módulo I.A. Os limiares são parâmetros iniciais para implantação e devem ser ajustados após a observação do comportamento legítimo do serviço. A ocorrência de um evento isolado não representa necessariamente um incidente; a classificação considera a frequência, a combinação de eventos e a criticidade do controle envolvido.
+
+As regras de assinatura utilizam contagens em janelas de tempo. As regras de anomalia comparam o comportamento atual com o histórico do promotor, especialmente quanto à origem dos acessos e ao volume de downloads. Quando não houver histórico suficiente, o evento deve ser registrado para formação da linha de base, sem gerar automaticamente uma conclusão de comprometimento.
+
+| Regra | Condição para alerta | Eventos relacionados | Risco | Severidade inicial |
+|---|---|---|---|---|
+| **RD01. Repetição de falhas de autenticação** | Cinco ou mais tokens de identidade recusados para o mesmo promotor ou origem em cinco minutos. | E2 | RI13, RI03 | Média |
+| **RD02. Requisições sem sessão válida** | Quatro ou mais requisições sem sessão válida para a mesma origem em cinco minutos. | E3 | RI08 | Média |
+| **RD03. Tentativas de acesso a recursos de terceiros** | Três ou mais acessos negados por propriedade em dez minutos, ou tentativa de consultar dez ou mais identificadores distintos no mesmo intervalo. | E5 | RI01 | Alta |
+| **RD04. Acesso de origem não habitual** | Criação de sessão a partir de país ou provedor de acesso ainda não observado no histórico do promotor. | E1 | RI13, RI08 | Média |
+| **RD05. Volume atípico de downloads** | Volume de downloads superior a três vezes a média histórica do promotor em período equivalente. | E6 | RI07 | Média |
+| **RD06. Uso recorrente acima dos limites** | Repetição de recusas por limite de solicitações, chats ou perguntas em uma janela de dez minutos. | E7 | RI09, RI12 | Média |
+| **RD07. Falha de autenticação entre serviços** | Qualquer chamada recusada no endpoint de atualização de status por ausência, invalidade ou inadequação do certificado mTLS. | E8 | RI04 | Alta |
+| **RD08. Falha de integridade da fila** | Qualquer mensagem recusada por assinatura inválida ou divergência entre o hash recebido e o hash esperado. | E9 | RI05, RI15, RI16 | Alta |
+| **RD09. Violação de integridade de transcrição** | Arquivo ausente ou divergência de hash após a finalização da transcrição. | E10 | RI14 | Alta |
+| **RD10. Repetição de falhas de processamento** | Cinco ou mais transcrições com falha para o mesmo promotor em dez minutos. | E11 | RI10, RI06 | Média |
+
+As regras RD01, RD02 e RD03 procuram identificar tentativas repetidas de autenticação e acesso indevido. Os limiares permitem diferenciar uma falha pontual de um comportamento persistente. Na RD03, a quantidade de identificadores distintos é especialmente relevante: a tentativa de consultar vários recursos em sequência pode indicar enumeração de identificadores, mesmo que todas as requisições sejam bloqueadas pela autorização por propriedade.
+
+A RD04 depende de histórico de acesso por promotor. Uma origem inédita não comprova, isoladamente, uma invasão, pois o usuário pode estar utilizando outra rede ou dispositivo. Por isso, o alerta deve ser tratado como sinal para verificação, principalmente quando acompanhado de falhas de autenticação ou de comportamento incompatível com o histórico.
+
+A RD05 acompanha o risco RI07, aceito no plano de tratamento. Como o serviço não consegue impedir que um promotor copie uma transcrição já baixada para outra ferramenta, o volume de downloads funciona como indicador para investigação. A comparação com a média histórica evita estabelecer uma quantidade fixa que possa ser inadequada para promotores com rotinas diferentes.
+
+As regras RD07, RD08 e RD09 possuem limiar unitário. Uma falha de autenticação entre serviços, uma assinatura inválida ou uma divergência de integridade representa uma ocorrência relevante em um controle de segurança crítico. Nesses casos, a equipe responsável deve verificar a origem do evento antes de permitir a continuidade da operação afetada.
+
+Os alertas devem conter o identificador da regra, a severidade, o período analisado, os identificadores dos eventos relacionados e os dados necessários à investigação. Não devem conter transcrições, mídias, mensagens de chat, senhas ou tokens. A centralização e a correlação dos registros permitem identificar sequências de eventos que, individualmente, poderiam parecer legítimas.
+
+Os limiares e as regras desta seção constituem uma especificação para a implementação do monitoramento. No protótipo, os registros de token recusado e de acesso negado já fornecem parte dos dados necessários, mas não existe ainda um componente que execute essas regras e gere os alertas correspondentes.
 
 ---
 
 ### 5. Depois do alerta
 
-Pendente.
+A geração de um alerta inicia um processo de triagem e resposta. O
+alerta não deve ser tratado automaticamente como confirmação de
+incidente: primeiro é necessário verificar se os registros são
+consistentes, se o comportamento pode ser explicado por uma atividade
+legítima e se há evidências de que um controle foi contornado ou
+violado.
 
+O fluxo de resposta proposto segue cinco etapas:
+
+1.  **Triagem e classificação.** A equipe responsável pelo serviço
+    verifica a regra acionada, a severidade, o período, o promotor
+    envolvido e os eventos relacionados. Deve consultar os registros
+    anteriores e posteriores à ocorrência para identificar se há uma
+    sequência de tentativas. Alertas duplicados ou explicados por uma
+    atividade legítima podem ser encerrados como falso positivo, com a
+    justificativa registrada.
+2.  **Contenção.** Quando houver indícios de comprometimento, a equipe
+    técnica deve limitar a continuidade da atividade suspeita. Conforme
+    o caso, isso pode envolver revogar as sessões do promotor, solicitar
+    nova autenticação, bloquear temporariamente uma origem, suspender o
+    processamento de mensagens suspeitas da fila ou isolar o componente
+    afetado. A contenção deve preservar a disponibilidade do serviço
+    sempre que possível e não deve eliminar os registros necessários à
+    investigação.
+3.  **Investigação e preservação de evidências.** A equipe deve reunir
+    os eventos relacionados, os horários, os identificadores de
+    recursos, as respostas HTTP, a origem das requisições e as
+    alterações de estado. Os registros devem ser preservados no
+    repositório central, com controle de acesso e proteção contra
+    alteração. A investigação deve verificar se houve acesso efetivo a
+    dados, alteração de estado, uso indevido de sessão ou
+    comprometimento da comunicação entre serviços. Conteúdos de
+    transcrições e mídias não devem ser copiados para os registros de
+    investigação sem necessidade e autorização.
+4.  **Erradicação e recuperação.** Confirmada a causa, a equipe técnica
+    corrige a vulnerabilidade ou configuração responsável, revoga
+    credenciais comprometidas, substitui certificados quando necessário
+    e valida a integridade dos componentes afetados. O serviço só deve
+    retornar à operação normal após a verificação dos controles
+    envolvidos e a confirmação de que a condição que originou o alerta
+    foi eliminada.
+5.  **Encerramento e melhoria.** A equipe registra a causa identificada,
+    o impacto, as ações executadas, o tempo de resposta e a conclusão da
+    investigação. Quando aplicável, as regras de detecção devem ser
+    ajustadas para reduzir falsos positivos ou identificar melhor o
+    comportamento observado. Riscos residuais e incidentes que indiquem
+    falha de controles devem ser comunicados à gestão responsável.
+
+A prioridade da resposta deve considerar a severidade inicial e o
+impacto confirmado. Alertas de severidade alta, como falha de
+autenticação mútua, assinatura inválida, divergência de hash ou violação
+da integridade de uma transcrição finalizada, devem ser encaminhados
+imediatamente à equipe técnica responsável. Alertas de severidade média
+devem passar por triagem, com escalonamento quando houver recorrência ou
+associação com outros eventos.
+
+A responsabilidade pela execução técnica da contenção e recuperação é da
+equipe que administra o serviço. A gestão do Ministério Público deve ser
+comunicada quando houver suspeita de exposição de transcrições,
+comprometimento de contas, impacto sobre dados institucionais ou
+necessidade de aceitar risco residual. A decisão sobre comunicação
+institucional e medidas administrativas deve seguir os procedimentos
+internos aplicáveis.
+
+Para avaliar a efetividade do processo, devem ser acompanhados, no
+mínimo, o tempo entre a ocorrência e a geração do alerta, o tempo até a
+triagem, o tempo de contenção, a quantidade de falsos positivos, os
+incidentes confirmados e a recorrência de eventos após a correção. Esses
+indicadores permitem verificar se as regras estão produzindo alertas
+úteis e se a resposta está reduzindo o impacto dos incidentes.
+
+Assim, o monitoramento complementa os controles preventivos definidos
+nas etapas anteriores. Enquanto a arquitetura segura e as práticas de
+código seguro procuram impedir acessos e operações indevidas, as regras
+desta etapa procuram identificar tentativas recorrentes, comportamentos
+atípicos e violações que não podem ser integralmente evitadas por
+controles preventivos.
 ---
 
 ### 6. Referências

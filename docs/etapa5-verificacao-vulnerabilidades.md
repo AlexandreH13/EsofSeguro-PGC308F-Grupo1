@@ -100,10 +100,24 @@ Pendente.
 
 ### 6. Alertas descartados e limites da verificação
 
-Pendente.
+Dois alertas informativos ficam fora da análise. "Modern Web Application" (regra 10109) só reconhece que as páginas carregam `app.js` e montam o conteúdo por script; é uma dica para usar o spider de cliente, não uma falha. "Session Management Response Identified" (regra 10112) identificou `tokenSessao` na resposta de `POST /api/sessao` como token de sessão. É o funcionamento esperado da prática 1: token opaco de 256 bits, guardado em memória no Backend e enviado pela interface no cabeçalho `Authorization`. Nada a corrigir.
+
+O scan ativo não gerou alerta. As 10.241 requisições com injeção em query, no corpo JSON e nos segmentos de caminho (SQL, XSS, path traversal e injeção de comando, entre as regras da política padrão) voltaram sem indício de falha. Isso é coerente com o código: consultas JPA parametrizadas, ids tipados como UUID (fora do formato a resposta é 400, como no roteiro) e dados no DOM só por `textContent`.
+
+Nenhum dos três achados é falso positivo, porque a ausência dos cabeçalhos está nas respostas. O que o scanner não mede é o impacto no protótipo, que é baixo: não há XSS conhecido e a sessão fica por aba. Em produção os três cabeçalhos são obrigatórios de qualquer forma.
+
+O limite principal é que o ZAP não avalia lógica de negócio. RS01 (propriedade do recurso) e RS02 (segundo fator) estão fora do alcance de um scanner genérico, que não sabe qual promotor deveria ver qual transcrição nem o que o claim `amr` significa. A prova de que esses requisitos estão cumpridos é o `trafego.log`, com 401 em todo token sem `mfa`, adulterado ou inválido e 403 uniforme em id alheio ou inexistente, somado aos testes TS01 a TS06 da Etapa 4. Dois pontos do ambiente também ficam fora: o tráfego é HTTP sem TLS dentro do compose, então as regras de HSTS e de cookie seguro não se aplicam, e o provedor de identidade é simulado, então o fluxo real de login não foi exercitado.
 
 ---
 
 ### 7. Referências
 
-Pendente.
+- ZAP, alerta 10038, Content Security Policy (CSP) Header Not Set: <https://www.zaproxy.org/docs/alerts/10038/>
+- ZAP, alerta 10020, Missing Anti-clickjacking Header: <https://www.zaproxy.org/docs/alerts/10020/>
+- ZAP, alerta 10021, X-Content-Type-Options Header Missing: <https://www.zaproxy.org/docs/alerts/10021/>
+- OWASP Top 10 2021, A05 Security Misconfiguration: <https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/>
+- OWASP Content Security Policy Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html>
+- OWASP Clickjacking Defense Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html>
+- OWASP HTTP Headers Cheat Sheet: <https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html>
+- CWE-693, Protection Mechanism Failure: <https://cwe.mitre.org/data/definitions/693.html>
+- CWE-1021, Improper Restriction of Rendered UI Layers or Frames: <https://cwe.mitre.org/data/definitions/1021.html>

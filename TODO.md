@@ -6,15 +6,10 @@
 - Etapa 2 entregue: análise com registro RI01 a RI16, justificativas e priorização em [docs/etapa2-analise-de-risco.md](docs/etapa2-analise-de-risco.md); plano de tratamento, residual, ordem de implementação e conclusão em [docs/etapa2-tratamento-de-risco-nist.md](docs/etapa2-tratamento-de-risco-nist.md). As pendências de 27/09 foram fechadas no PR #17.
 - Etapa 3 entregue em [docs/etapa3-arquitetura-segura.md](docs/etapa3-arquitetura-segura.md): requisitos de segurança (seção 1, RS01 a RS03, derivados de RI01, RI13 e RI04), vulnerabilidades catalogadas (seção 2, V01 a V03), diagrama da arquitetura segura (seção 3) e decisões de arquitetura (seção 4).
 - Etapa 4 entregue em [docs/etapa4-codigo-seguro.md](docs/etapa4-codigo-seguro.md) e [prototipo](prototipo): escopo, fase 0, prática 1 (sessão com segundo fator, TS01 a TS03), prática 2 (autorização por propriedade, TS04 a TS06) e interface, mais chat temporário e download em DOCX como extras.
-- Etapa 5 em andamento em [docs/etapa5-verificacao-vulnerabilidades.md](docs/etapa5-verificacao-vulnerabilidades.md): serviço do ZAP no compose do protótipo, seções 1 a 3 e a sessão com as evidências (seção 4) prontos. Faltam a análise dos achados (seção 5) e os descartes e limites (seções 6 e 7).
+- Etapa 5 entregue em [docs/etapa5-verificacao-vulnerabilidades.md](docs/etapa5-verificacao-vulnerabilidades.md): sessão do ZAP no compose, evidências em [evidencias/etapa-5](evidencias/etapa-5), três achados de cabeçalho analisados com correção proposta. Etapas 6 e 7 e o artigo final não começaram.
 - Etapa 6 em andamento em [docs/etapa6-deteccao-de-intrusoes.md](docs/etapa6-deteccao-de-intrusoes.md): conceito, diferença entre prevenir e detectar e eventos a registrar (seções 1 a 3) prontos. Faltam as três regras de detecção (seção 4) e a resposta ao alerta (seção 5). Etapa 7 e o artigo final não começaram.
 
 Referências de formato: [exemplo do professor](https://github.com/sequincozes/exemplo-atividade-es-seguro) e [VitaLink](https://github.com/camillabdt/VitaLink).
-
-## Pendências da Etapa 5
-
-- Análise dos três achados e correção proposta (seção 5).
-- Alertas descartados, limites e referências (seções 6 e 7).
 
 ## Pendências da Etapa 6
 
@@ -30,6 +25,7 @@ Referências de formato: [exemplo do professor](https://github.com/sequincozes/e
 
 ## Pendências gerais
 
+- Implementar o filtro de cabeçalhos proposto na Etapa 5 (CSP, X-Frame-Options, nosniff), tirar os scripts e estilos embutidos das telas e repetir a sessão do ZAP como prova.
 - Registrar no protótipo os eventos da seção 3 da Etapa 6 que ainda faltam: origem e rota no registro `ACESSO_NEGADO` (E5), sessão criada (E1), 401 do filtro (E3), sessão encerrada (E4) e download (E6).
 
 - Atualizar o caso de uso [RQF1](docs/requisitos%20funcionais/RQF1-acesso-com-credenciais.md): o passo "Valida assinatura, emissor e validade do token" passa a conferir também audiência e papel de promotor (RI03) e o claim de segundo fator (RS02). Pelo mesmo motivo, anotar o TLS mútuo do endpoint de status no [RQF4](docs/requisitos%20funcionais/RQF4-acompanhamento-do-status-da-transcricao.md) (RS03).
