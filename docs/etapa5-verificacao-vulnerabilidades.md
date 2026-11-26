@@ -94,7 +94,31 @@ Content-Length: 133
 
 ### 5. Análise dos achados
 
-Pendente.
+| ID | Alerta ou achado | Evidência | Possível impacto | Relação com OWASP ou CWE | Correção proposta |
+| --- | --- | --- | --- | --- | --- |
+| A01 | Resposta sem `Content-Security-Policy` nas páginas HTML | Regra 10038 do ZAP, instâncias em `/`, `/index.html`, `/transcricoes.html`, `/transcricao.html` e `/sessao-encerrada.html`; cabeçalhos de `/index.html` na seção 4 | Sem CSP o navegador executa qualquer script que chegue à página. Se um XSS passar pelas defesas da interface, o script lê o token em `sessionStorage` e usa a sessão do promotor em todas as transcrições dele, o mesmo impacto de RI01 | CWE-693; OWASP Top 10 2021 A05 Security Misconfiguration; OWASP Content Security Policy Cheat Sheet | Cabeçalho `Content-Security-Policy: default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`, com os scripts embutidos das telas T1, T3 e T4 movidos para arquivos `.js` e os atributos `style` para o `estilo.css`, porque a política bloqueia script e estilo embutidos |
+| A02 | Resposta sem `X-Frame-Options` nem `frame-ancestors` | Regra 10020 do ZAP, mesmas páginas | Página do serviço embutida num quadro invisível em site hostil: o promotor induzido a entrar e clicar aciona a exclusão de uma transcrição (RQF9) sem perceber. O token em `sessionStorage` por aba reduz o alcance, porque o quadro não herda a sessão de outra aba, mas não impede o login induzido dentro do quadro | CWE-1021; OWASP Clickjacking Defense Cheat Sheet; OWASP Top 10 2021 A05 | `X-Frame-Options: DENY` em toda resposta, mais a diretiva `frame-ancestors 'none'` da CSP de A01 |
+| A03 | Resposta sem `X-Content-Type-Options: nosniff` em HTML, CSS e JSON | Regra 10021 do ZAP, 18 ocorrências; cabeçalhos de `/idp-fake/promotores` na seção 4 | Navegador antigo pode reinterpretar o tipo da resposta. A rota de abrir (RQF6) devolve o texto da transcrição dentro do JSON, e sem `nosniff` um navegador antigo que abrisse essa resposta direto poderia tratá-la como HTML e executar script escondido no texto, na origem do serviço | CWE-693; OWASP HTTP Headers Cheat Sheet | `X-Content-Type-Options: nosniff` em toda resposta |
+
+Os três achados têm a mesma causa: o Backend não define cabeçalhos de segurança, porque o protótipo não usa Spring Security e nenhuma prática da Etapa 4 tratou disso. A correção proposta é um filtro no Backend aplicado a toda resposta, estática ou de API:
+
+```java
+@Component
+public class CabecalhosSeguranca extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest requisicao, HttpServletResponse resposta,
+                                    FilterChain cadeia) throws ServletException, IOException {
+        resposta.setHeader("Content-Security-Policy",
+                "default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+        resposta.setHeader("X-Frame-Options", "DENY");
+        resposta.setHeader("X-Content-Type-Options", "nosniff");
+        cadeia.doFilter(requisicao, resposta);
+    }
+}
+```
+
+A CSP é a parte que exige trabalho na interface: as telas T1, T3 e T4 têm um bloco `<script>` embutido cada uma e todas usam atributos `style`. Com `default-src 'self'` o navegador bloqueia os dois, então os blocos passam para arquivos `.js` e os estilos para o `estilo.css` antes de ligar o cabeçalho. Critério de aceitação: repetir a sessão do ZAP, os alertas 10038, 10020 e 10021 desaparecem, e o roteiro de demonstração continua funcionando no navegador. A correção entra como um PR próprio, com a nova sessão como prova.
 
 ---
 
