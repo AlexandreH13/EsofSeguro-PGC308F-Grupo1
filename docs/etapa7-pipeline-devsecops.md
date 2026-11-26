@@ -65,16 +65,44 @@ Como melhorias sugeridas ao projeto, os artefatos devem ser associados ao SHA do
 
 ### 3. Análise de código, dependências e imagem
 
-Pendente.
+Nenhuma etapa anterior analisou o código-fonte ou as bibliotecas do protótipo. Para cobrir esse momento, o pipeline incluiria quatro ferramentas gratuitas:
+
+| Ferramenta | O que procura | Onde entra | Quando falha |
+| --- | --- | --- | --- |
+| gitleaks | Segredos no código e no histórico do git | Pre-commit e primeiro passo do pipeline | Qualquer achado (P4) |
+| SpotBugs com FindSecBugs | Padrões inseguros no código Java | Fase `verify` do Maven | Achado de segurança de prioridade alta sem justificativa |
+| OWASP Dependency-Check | Dependências do `pom.xml` com CVE publicada | Fase `verify` do Maven | CVSS 7 ou maior sem decisão registrada (P5) |
+| Trivy | Vulnerabilidades na imagem final; gera também o SBOM | Depois do `docker build` | Alta ou crítica sem decisão registrada (P5) |
+
+No case, a `nimbus-jose-jwt`, que valida o token da prática 1, e a `poi-ooxml`, que gera o .docx do RQF8, processam dados vindos de fora, e uma falha nelas atinge um controle ou um dado sigiloso. O protótipo não guarda segredos no repositório, mas a implementação completa teria a credencial da fila, a chave da I.A externa e os certificados do TLS mútuo; um vazamento da credencial da fila é o cenário do CAE5. O SBOM, lista dos componentes da imagem com suas versões, fica guardado com o digest e o commit, para saber sem novo build se uma vulnerabilidade publicada depois atinge a imagem em produção.
 
 ---
 
 ### 4. Condições que param o pipeline
 
-Pendente.
+Definimos cinco, identificadas de P1 a P5; são os códigos que aparecem nos losangos do diagrama da seção 1 e na última coluna da tabela da seção 2. Todas estão ligadas a riscos e evidências do projeto:
+
+| ID | Condição | Momento | Como é detectada | Por que para |
+| --- | --- | --- | --- | --- |
+| P1 | Teste de segurança reprovado | 4 | `mvn test`, no build da imagem ou no serviço `testes` | Um dos TS01 a TS03 reprovado significa sessão aberta sem segundo fator (RI13); um dos TS04 a TS06, acesso à transcrição de outro promotor (RI01) |
+| P2 | Falha no controle de acesso na aplicação em execução | 6 | Linha `[DIVERGENTE]` no `trafego.log` do ZAP, ou resposta 2xx a uma rota de transcrição chamada com a sessão de outro promotor | Os testes podem passar e a aplicação implantada, com outra configuração, abrir a rota; é a V01 em execução |
+| P3 | Alerta alto do ZAP, ou alerta médio sem análise e decisão registradas | 6 | `alertas.md` da sessão | Na Etapa 5, os dois alertas médios (10038 e 10020) só foram aceitos depois da análise e da correção proposta |
+| P4 | Segredo encontrado no repositório | 5 | gitleaks | Um segredo no histórico do git continua exposto mesmo depois de apagado do arquivo, e precisa ser revogado e trocado |
+| P5 | Dependência ou imagem com vulnerabilidade alta ou crítica sem decisão registrada | 5 e 7 | OWASP Dependency-Check e Trivy | Uma biblioteca vulnerável pode anular um controle, como a validação do token da prática 1 |
+
+Uma condição só deixa de bloquear de duas formas: a falha é corrigida e a verificação passa, ou, quando não há correção disponível (por exemplo, uma vulnerabilidade sem versão corrigida da biblioteca), o grupo registra no pull request a decisão de aceitar o risco, com justificativa e prazo de revisão, como o plano NIST fez com RI07, RI10 e RI14. A aceitação vale só para P3 e P5. P1, P2 e P4 sempre exigem correção: teste reprovado e controle de acesso falho indicam que um requisito de segurança não está sendo cumprido, e um segredo exposto precisa ser revogado e trocado, porque continua no histórico do git mesmo depois de apagado do arquivo. Por isso, no losango do diagrama que reúne P4 e P5, o caminho de aceitação de risco se aplica apenas à dependência vulnerável.
 
 ---
 
 ### 5. Referências
 
-Pendente.
+- NIST SP 800-218, Secure Software Development Framework (SSDF): <https://csrc.nist.gov/pubs/sp/800/218/final>
+- OWASP DevSecOps Guideline: <https://owasp.org/www-project-devsecops-guideline/>
+- OWASP Top 10 2021, A06 Vulnerable and Outdated Components: <https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/>
+- OWASP Dependency-Check: <https://owasp.org/www-project-dependency-check/>
+- SpotBugs: <https://spotbugs.github.io/>
+- Find Security Bugs: <https://find-sec-bugs.github.io/>
+- gitleaks: <https://github.com/gitleaks/gitleaks>
+- Trivy: <https://trivy.dev/>
+- ZAP: <https://www.zaproxy.org/>
+- CWE-798, Use of Hard-coded Credentials: <https://cwe.mitre.org/data/definitions/798.html>
